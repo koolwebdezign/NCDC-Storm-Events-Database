@@ -17,10 +17,21 @@ My first step in preparing my analysis will be to write a script to get the data
 if (!file.exists("./stormdata.csv")) {
     # Load the R.utils library
     library("R.utils")
+    
+    i <- 1
 
-    for (year in 2010:2013) {
+    for (year in 2006:2016) {
+        # Determine file name extension
+        if (year==2014) {
+            extstr <- "_c20160617.csv.gz"
+        } else if (year==2015 || year==2016) {
+            extstr <- "_c20160921.csv.gz"
+        } else {
+            extstr <- "_c20160223.csv.gz"
+        }
+        
         # Identify the URL of the download file
-        URL <- paste("ftp://ftp.ncdc.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d", year, "_c20160223.csv.gz", sep="")
+        URL <- paste("ftp://ftp.ncdc.noaa.gov/pub/data/swdi/stormevents/csvfiles/StormEvents_details-ftp_v1.0_d", year, extstr, sep="")
         #print(URL)
 
         # Download the file into the current directory
@@ -31,8 +42,14 @@ if (!file.exists("./stormdata.csv")) {
 
         # Read the file into memory
         tempdata <- read.csv("./temp.csv")
+        
+        # Delete the lengthy narrative columns
+        # Filesize with these columns is 272MB
+        # Filesize without these columns 79MB
+        tempdata$EPISODE_NARRATIVE <- NULL
+        tempdata$EVENT_NARRATIVE <- NULL
     
-        if (year==2010) {
+        if (i==1) {
             stormdata <- tempdata
         } else {
             stormdata <- rbind(stormdata, tempdata)
@@ -43,20 +60,54 @@ if (!file.exists("./stormdata.csv")) {
         
         # Write the loaded data to local CSV file
         write.csv(stormdata, "./stormdata.csv")
+        
+        # Increment i
+        i <- i+1
     }
     
 } else if (!exists("stormdata")) {
     stormdata <- read.csv("./stormdata.csv")
 }
-   
-# Output the first 10 rows of the file
-head(stormdata, n=10)
+
+```
+
+The script above has successfully assembled 10+ years of data from the NCDC Storm Events Database from calendar year 2006 through summer of 2016.  We have eliminated the long text fields related to the description of the storm events.  We did this in order to produce a table size which is manageable on our desktop computers.  Elimination of these text fields dropped the file size to nearly 25% of its original size.  Our final CSV file is appx 193MB in size and it contains 656K observations of 50 variables.
+
+It is now desirable to conduct some exploration techniques as outlined on RDatamining.com.  We will follow the examples put forth on the following page in order to begin our exploration of this significant data file.
+
+<http://www.rdatamining.com/examples/exploration>
+
+
+```{r}
+# View the data frame inside the Global Environment of R Studio
+#View(stormdata)
+
+# Check the dimensionality
+dim(stormdata)
 
 # Output the names of the columns
 names(stormdata)
 
 # List the structure of the file
 str(stormdata)
+
+# Output the first 5 rows of the file
+head(stormdata, n=5)
+
+# Distribution of every variable
+summary(stormdata)
+
+# Frequency of event types
+counts <- table(stormdata$EVENT_TYPE)
+
+# Get the names of columns on counts table
+names(counts)
+
+# Pie Chart
+pie(counts)
+
+# Simple Bar Plot
+barplot(counts, main="Storm Event Type", horiz=TRUE, xlab="Frequency", names.arg=names(counts), cex.names=0.5, las=1)
 
 ```
 
