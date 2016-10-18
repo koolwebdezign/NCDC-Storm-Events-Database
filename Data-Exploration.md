@@ -171,121 +171,71 @@ str(stormdata)
 ```
 
 ```r
-# Output the first 10 rows of the file
-head(stormdata, n=10)
+# Output the first 5 rows of the file
+head(stormdata, n=5)
 ```
 
 ```
-##     X BEGIN_YEARMONTH BEGIN_DAY BEGIN_TIME END_YEARMONTH END_DAY END_TIME
-## 1   1          200604         7       1515        200604       7     1515
-## 2   2          200601         1          0        200601      31     2359
-## 3   3          200601         1          0        200601      31     2359
-## 4   4          200601         1          0        200601      31     2359
-## 5   5          200601         1          0        200601      31     2359
-## 6   6          200601        10       1100        200601      10     1100
-## 7   7          200601        30        500        200601      31     1400
-## 8   8          200601        30        500        200601      31     1400
-## 9   9          200601        28        800        200601      29     1300
-## 10 10          200601        28       1400        200601      29      500
-##    EPISODE_ID EVENT_ID    STATE STATE_FIPS YEAR MONTH_NAME
-## 1     1207534  5501658  INDIANA         18 2006      April
-## 2     1202408  5482463 COLORADO          8 2006    January
-## 3     1202408  5482464 COLORADO          8 2006    January
-## 4     1202408  5482465 COLORADO          8 2006    January
-## 5     1202408  5482466 COLORADO          8 2006    January
-## 6     1202432  5482724   KANSAS         20 2006    January
-## 7     1202394  5482324 COLORADO          8 2006    January
-## 8     1202394  5482325 COLORADO          8 2006    January
-## 9     1202395  5482326 COLORADO          8 2006    January
-## 10    1202396  5482327 COLORADO          8 2006    January
-##           EVENT_TYPE CZ_TYPE CZ_FIPS                    CZ_NAME WFO
-## 1  Thunderstorm Wind       C      51                     GIBSON PAH
-## 2            Drought       Z       2  CENTRAL YAMPA RIVER BASIN GJT
-## 3            Drought       Z       7   DEBEQUE TO SILT CORRIDOR GJT
-## 4            Drought       Z       4 ELKHEAD AND PARK MOUNTAINS GJT
-## 5            Drought       Z      13          FLATTOP MOUNTAINS GJT
-## 6         Heavy Snow       Z      92                     SUMNER ICT
-## 7     Winter Weather       Z       4 ELKHEAD AND PARK MOUNTAINS GJT
-## 8     Winter Weather       Z      13          FLATTOP MOUNTAINS GJT
-## 9       Winter Storm       Z      13          FLATTOP MOUNTAINS GJT
-## 10    Winter Weather       Z       5    UPPER YAMPA RIVER BASIN GJT
-##       BEGIN_DATE_TIME CZ_TIMEZONE      END_DATE_TIME INJURIES_DIRECT
-## 1  07-APR-06 15:15:00         CST 07-APR-06 15:15:00               0
-## 2  01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
-## 3  01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
-## 4  01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
-## 5  01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
-## 6  10-JAN-06 11:00:00         CST 10-JAN-06 11:00:00               0
-## 7  30-JAN-06 05:00:00         MST 31-JAN-06 14:00:00               0
-## 8  30-JAN-06 05:00:00         MST 31-JAN-06 14:00:00               0
-## 9  28-JAN-06 08:00:00         MST 29-JAN-06 13:00:00               0
-## 10 28-JAN-06 14:00:00         MST 29-JAN-06 05:00:00               0
-##    INJURIES_INDIRECT DEATHS_DIRECT DEATHS_INDIRECT DAMAGE_PROPERTY
-## 1                  0             0               0             60K
-## 2                  0             0               0                
-## 3                  0             0               0                
-## 4                  0             0               0                
-## 5                  0             0               0                
-## 6                  0             0               0               0
-## 7                  0             0               0                
-## 8                  0             0               0                
-## 9                  0             0               0                
-## 10                 0             0               0                
-##    DAMAGE_CROPS                SOURCE MAGNITUDE MAGNITUDE_TYPE FLOOD_CAUSE
-## 1                      GENERAL PUBLIC        61             EG            
-## 2                       GOVT OFFICIAL        NA                           
-## 3                       GOVT OFFICIAL        NA                           
-## 4                       GOVT OFFICIAL        NA                           
-## 5                       GOVT OFFICIAL        NA                           
-## 6             0       TRAINED SPOTTER        NA                           
-## 7               AWOS,ASOS,MESONET,ETC        NA                           
-## 8               AWOS,ASOS,MESONET,ETC        NA                           
-## 9               AWOS,ASOS,MESONET,ETC        NA                           
-## 10                    TRAINED SPOTTER        NA                           
-##    CATEGORY TOR_F_SCALE TOR_LENGTH TOR_WIDTH TOR_OTHER_WFO
-## 1        NA                     NA        NA              
-## 2        NA                     NA        NA              
-## 3        NA                     NA        NA              
-## 4        NA                     NA        NA              
-## 5        NA                     NA        NA              
-## 6        NA                     NA        NA              
-## 7        NA                     NA        NA              
-## 8        NA                     NA        NA              
-## 9        NA                     NA        NA              
-## 10       NA                     NA        NA              
-##    TOR_OTHER_CZ_STATE TOR_OTHER_CZ_FIPS TOR_OTHER_CZ_NAME BEGIN_RANGE
-## 1                                    NA                             4
-## 2                                    NA                            NA
-## 3                                    NA                            NA
-## 4                                    NA                            NA
-## 5                                    NA                            NA
-## 6                                    NA                            NA
-## 7                                    NA                            NA
-## 8                                    NA                            NA
-## 9                                    NA                            NA
-## 10                                   NA                            NA
-##    BEGIN_AZIMUTH BEGIN_LOCATION END_RANGE END_AZIMUTH END_LOCATION
-## 1              E         PATOKA        NA             OAKLAND CITY
-## 2                                      NA                         
-## 3                                      NA                         
-## 4                                      NA                         
-## 5                                      NA                         
-## 6                                      NA                         
-## 7                                      NA                         
-## 8                                      NA                         
-## 9                                      NA                         
-## 10                                     NA                         
-##    BEGIN_LAT BEGIN_LON END_LAT END_LON DATA_SOURCE
-## 1      38.42    -87.52   38.33  -87.35         PDS
-## 2         NA        NA      NA      NA         PDS
-## 3         NA        NA      NA      NA         PDS
-## 4         NA        NA      NA      NA         PDS
-## 5         NA        NA      NA      NA         PDS
-## 6         NA        NA      NA      NA         PDS
-## 7         NA        NA      NA      NA         PDS
-## 8         NA        NA      NA      NA         PDS
-## 9         NA        NA      NA      NA         PDS
-## 10        NA        NA      NA      NA         PDS
+##   X BEGIN_YEARMONTH BEGIN_DAY BEGIN_TIME END_YEARMONTH END_DAY END_TIME
+## 1 1          200604         7       1515        200604       7     1515
+## 2 2          200601         1          0        200601      31     2359
+## 3 3          200601         1          0        200601      31     2359
+## 4 4          200601         1          0        200601      31     2359
+## 5 5          200601         1          0        200601      31     2359
+##   EPISODE_ID EVENT_ID    STATE STATE_FIPS YEAR MONTH_NAME
+## 1    1207534  5501658  INDIANA         18 2006      April
+## 2    1202408  5482463 COLORADO          8 2006    January
+## 3    1202408  5482464 COLORADO          8 2006    January
+## 4    1202408  5482465 COLORADO          8 2006    January
+## 5    1202408  5482466 COLORADO          8 2006    January
+##          EVENT_TYPE CZ_TYPE CZ_FIPS                    CZ_NAME WFO
+## 1 Thunderstorm Wind       C      51                     GIBSON PAH
+## 2           Drought       Z       2  CENTRAL YAMPA RIVER BASIN GJT
+## 3           Drought       Z       7   DEBEQUE TO SILT CORRIDOR GJT
+## 4           Drought       Z       4 ELKHEAD AND PARK MOUNTAINS GJT
+## 5           Drought       Z      13          FLATTOP MOUNTAINS GJT
+##      BEGIN_DATE_TIME CZ_TIMEZONE      END_DATE_TIME INJURIES_DIRECT
+## 1 07-APR-06 15:15:00         CST 07-APR-06 15:15:00               0
+## 2 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
+## 3 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
+## 4 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
+## 5 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
+##   INJURIES_INDIRECT DEATHS_DIRECT DEATHS_INDIRECT DAMAGE_PROPERTY
+## 1                 0             0               0             60K
+## 2                 0             0               0                
+## 3                 0             0               0                
+## 4                 0             0               0                
+## 5                 0             0               0                
+##   DAMAGE_CROPS         SOURCE MAGNITUDE MAGNITUDE_TYPE FLOOD_CAUSE
+## 1              GENERAL PUBLIC        61             EG            
+## 2               GOVT OFFICIAL        NA                           
+## 3               GOVT OFFICIAL        NA                           
+## 4               GOVT OFFICIAL        NA                           
+## 5               GOVT OFFICIAL        NA                           
+##   CATEGORY TOR_F_SCALE TOR_LENGTH TOR_WIDTH TOR_OTHER_WFO
+## 1       NA                     NA        NA              
+## 2       NA                     NA        NA              
+## 3       NA                     NA        NA              
+## 4       NA                     NA        NA              
+## 5       NA                     NA        NA              
+##   TOR_OTHER_CZ_STATE TOR_OTHER_CZ_FIPS TOR_OTHER_CZ_NAME BEGIN_RANGE
+## 1                                   NA                             4
+## 2                                   NA                            NA
+## 3                                   NA                            NA
+## 4                                   NA                            NA
+## 5                                   NA                            NA
+##   BEGIN_AZIMUTH BEGIN_LOCATION END_RANGE END_AZIMUTH END_LOCATION
+## 1             E         PATOKA        NA             OAKLAND CITY
+## 2                                     NA                         
+## 3                                     NA                         
+## 4                                     NA                         
+## 5                                     NA                         
+##   BEGIN_LAT BEGIN_LON END_LAT END_LON DATA_SOURCE
+## 1     38.42    -87.52   38.33  -87.35         PDS
+## 2        NA        NA      NA      NA         PDS
+## 3        NA        NA      NA      NA         PDS
+## 4        NA        NA      NA      NA         PDS
+## 5        NA        NA      NA      NA         PDS
 ```
 
 ```r
@@ -410,46 +360,44 @@ summary(stormdata)
 
 ```r
 # Frequency of event types
-counts <- table(stormdata$EVENT_TYPE)
+counts <- sort(table(stormdata$EVENT_TYPE), decreasing=TRUE)
 
 # Get the names of columns on counts table
 names(counts)
 ```
 
 ```
-##  [1] "Astronomical Low Tide"      "Avalanche"                 
-##  [3] "Blizzard"                   "Coastal Flood"             
-##  [5] "Cold/Wind Chill"            "Debris Flow"               
-##  [7] "Dense Fog"                  "Dense Smoke"               
-##  [9] "Drought"                    "Dust Devil"                
-## [11] "Dust Storm"                 "Excessive Heat"            
-## [13] "Extreme Cold/Wind Chill"    "Flash Flood"               
-## [15] "Flood"                      "Freezing Fog"              
-## [17] "Frost/Freeze"               "Funnel Cloud"              
-## [19] "Hail"                       "Heat"                      
-## [21] "Heavy Rain"                 "Heavy Snow"                
-## [23] "High Surf"                  "High Wind"                 
-## [25] "Hurricane"                  "Ice Storm"                 
-## [27] "Lake-Effect Snow"           "Lakeshore Flood"           
-## [29] "Landslide"                  "Lightning"                 
-## [31] "Marine Dense Fog"           "Marine Hail"               
-## [33] "Marine High Wind"           "Marine Hurricane/Typhoon"  
-## [35] "Marine Lightning"           "Marine Strong Wind"        
-## [37] "Marine Thunderstorm Wind"   "Marine Tropical Depression"
-## [39] "Marine Tropical Storm"      "Rip Current"               
-## [41] "Seiche"                     "Sleet"                     
-## [43] "Sneakerwave"                "Storm Surge/Tide"          
-## [45] "Strong Wind"                "Thunderstorm Wind"         
-## [47] "Tornado"                    "Tropical Depression"       
-## [49] "Tropical Storm"             "Tsunami"                   
-## [51] "Volcanic Ash"               "Volcanic Ashfall"          
-## [53] "Waterspout"                 "Wildfire"                  
-## [55] "Winter Storm"               "Winter Weather"
+##  [1] "Thunderstorm Wind"          "Hail"                      
+##  [3] "Flash Flood"                "Winter Weather"            
+##  [5] "Drought"                    "Winter Storm"              
+##  [7] "High Wind"                  "Heavy Snow"                
+##  [9] "Flood"                      "Marine Thunderstorm Wind"  
+## [11] "Tornado"                    "Heavy Rain"                
+## [13] "Strong Wind"                "Frost/Freeze"              
+## [15] "Heat"                       "Blizzard"                  
+## [17] "Dense Fog"                  "Lightning"                 
+## [19] "Extreme Cold/Wind Chill"    "Excessive Heat"            
+## [21] "Cold/Wind Chill"            "High Surf"                 
+## [23] "Ice Storm"                  "Funnel Cloud"              
+## [25] "Wildfire"                   "Waterspout"                
+## [27] "Tropical Storm"             "Coastal Flood"             
+## [29] "Lake-Effect Snow"           "Rip Current"               
+## [31] "Dust Storm"                 "Marine Hail"               
+## [33] "Astronomical Low Tide"      "Landslide"                 
+## [35] "Storm Surge/Tide"           "Avalanche"                 
+## [37] "Tropical Depression"        "Sleet"                     
+## [39] "Debris Flow"                "Marine High Wind"          
+## [41] "Freezing Fog"               "Hurricane"                 
+## [43] "Dust Devil"                 "Marine Strong Wind"        
+## [45] "Lakeshore Flood"            "Seiche"                    
+## [47] "Tsunami"                    "Dense Smoke"               
+## [49] "Marine Tropical Storm"      "Marine Hurricane/Typhoon"  
+## [51] "Sneakerwave"                "Marine Dense Fog"          
+## [53] "Volcanic Ashfall"           "Marine Lightning"          
+## [55] "Marine Tropical Depression" "Volcanic Ash"
 ```
 
 ```r
-View(counts)
-
 # Pie Chart
 pie(counts)
 ```
@@ -457,8 +405,8 @@ pie(counts)
 ![](Data-Exploration_files/figure-html/unnamed-chunk-2-1.png) 
 
 ```r
-# Simple Bar Plot
-barplot(counts, main="Storm Event Type", horiz=TRUE, xlab="Test")
+# Simple Horizontal Bar Plot
+barplot(counts, main="Storm Event Type", horiz=TRUE, xlab="Frequency", names.arg=names(counts), cex.names=0.5, las=1)
 ```
 
 ![](Data-Exploration_files/figure-html/unnamed-chunk-2-2.png) 

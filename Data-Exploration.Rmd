@@ -7,6 +7,10 @@ output:
     keep_md: yes
 ---
 
+# NCDC Storm Events Database Analysis
+
+## Get and Clean Data from DATA.gov
+
 I am an MBA student at Bridgewater State University, enrolled in MGMT582 - Business Intelligence/Analytics.  This data exploration project is intended to be my final project and in-class presentation.  The goal of this project is to gain practical working experience with R Studio and to apply some data analysis techniques in which we have been introduced within this course.
 
 I have chosen to work with the NCDC Storm Events Database available at DATA.gov.  For more details related to this raw data set, see <https://catalog.data.gov/dataset/ncdc-storm-events-database>.
@@ -70,6 +74,7 @@ if (!file.exists("./stormdata.csv")) {
 }
 
 ```
+## Initial Table Exploration and Observation
 
 The script above has successfully assembled 10+ years of data from the NCDC Storm Events Database from calendar year 2006 through summer of 2016.  We have eliminated the long text fields related to the description of the storm events.  We did this in order to produce a table size which is manageable on our desktop computers.  Elimination of these text fields dropped the file size to nearly 25% of its original size.  Our final CSV file is appx 193MB in size and it contains 656K observations of 50 variables.
 
@@ -98,7 +103,7 @@ head(stormdata, n=5)
 summary(stormdata)
 
 # Frequency of event types
-counts <- table(stormdata$EVENT_TYPE)
+counts <- sort(table(stormdata$EVENT_TYPE), decreasing=TRUE)
 
 # Get the names of columns on counts table
 names(counts)
@@ -106,11 +111,24 @@ names(counts)
 # Pie Chart
 pie(counts)
 
-# Simple Bar Plot
+# Simple Horizontal Bar Plot
 barplot(counts, main="Storm Event Type", horiz=TRUE, xlab="Frequency", names.arg=names(counts), cex.names=0.5, las=1)
 
 ```
 
+## Table Sub-Setting
 
+The exercises in the *Initial Table Exploration and Observation* section allowed us to conduct some basic observations about the data set as a whole.  This is helpful yet when you browse the data and to gain a general understanding of the table content.  Now you may want to extract data into a subset (ie. to extract data by eliminating additional columns or to even extract information based on specific observations.)  Sub-setting is similar to strategies whereby one might execute a SQL SELECT statement from a database.  The difference here now with R is that our main data frame is sitting in memory.  We can now take pieces of this data set and conduct separate analysis.
+
+```{r}
+
+# Select by column
+myvars <- c("YEAR", "INJURIES_DIRECT", "INJURIES_INDIRECT", "DEATHS_DIRECT", "DEATHS_INDIRECT", "DAMAGE_PROPERTY", "DAMAGE_CROPS")
+impact <- stormdata[myvars]
+
+
+
+
+```
 
 
