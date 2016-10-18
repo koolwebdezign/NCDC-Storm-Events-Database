@@ -20,3 +20,5 @@ With this compiled data set, we can conduct some exploration techniques as outli
 
 The exercises in the *Initial Table Exploration and Observation* section allowed us to conduct some basic observations about the data set as a whole.  This is helpful yet when you browse the data and to gain a general understanding of the table content.  Now you may want to extract data into a subset (ie. to extract data by eliminating additional columns or to even extract information based on specific observations.)  Sub-setting is similar to strategies whereby one might execute a SQL SELECT statement from a database.  The difference here now with R is that our main data frame is sitting in memory.  We can now take pieces of this data set and conduct separate analysis.
 
+We will follow some instructions as outlined on the following webpage <http://www.statmethods.net/management/subset.html>
+

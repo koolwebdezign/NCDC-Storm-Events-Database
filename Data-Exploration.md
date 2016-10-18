@@ -2,6 +2,10 @@
 J. Welch  
 October 17, 2016  
 
+# NCDC Storm Events Database Analysis
+
+## Get and Clean Data from DATA.gov
+
 I am an MBA student at Bridgewater State University, enrolled in MGMT582 - Business Intelligence/Analytics.  This data exploration project is intended to be my final project and in-class presentation.  The goal of this project is to gain practical working experience with R Studio and to apply some data analysis techniques in which we have been introduced within this course.
 
 I have chosen to work with the NCDC Storm Events Database available at DATA.gov.  For more details related to this raw data set, see <https://catalog.data.gov/dataset/ncdc-storm-events-database>.
@@ -65,6 +69,7 @@ if (!file.exists("./stormdata.csv")) {
     stormdata <- read.csv("./stormdata.csv")
 }
 ```
+## Initial Table Exploration and Observation
 
 The script above has successfully assembled 10+ years of data from the NCDC Storm Events Database from calendar year 2006 through summer of 2016.  We have eliminated the long text fields related to the description of the storm events.  We did this in order to produce a table size which is manageable on our desktop computers.  Elimination of these text fields dropped the file size to nearly 25% of its original size.  Our final CSV file is appx 193MB in size and it contains 656K observations of 50 variables.
 
@@ -411,6 +416,299 @@ barplot(counts, main="Storm Event Type", horiz=TRUE, xlab="Frequency", names.arg
 
 ![](Data-Exploration_files/figure-html/unnamed-chunk-2-2.png) 
 
+## Table Sub-Setting
 
+The exercises in the *Initial Table Exploration and Observation* section allowed us to conduct some basic observations about the data set as a whole.  This is helpful yet when you browse the data and to gain a general understanding of the table content.  Now you may want to extract data into a subset (ie. to extract data by eliminating additional columns or to even extract information based on specific observations.)  Sub-setting is similar to strategies whereby one might execute a SQL SELECT statement from a database.  The difference here now with R is that our main data frame is sitting in memory.  We can now take pieces of this data set and conduct separate analysis.
+
+We will follow some instructions as outlined on the following webpage <http://www.statmethods.net/management/subset.html>
+
+
+
+```r
+# Create visualization of the header of the unmodified file
+head(stormdata, n=5)
+```
+
+```
+##   X BEGIN_YEARMONTH BEGIN_DAY BEGIN_TIME END_YEARMONTH END_DAY END_TIME
+## 1 1          200604         7       1515        200604       7     1515
+## 2 2          200601         1          0        200601      31     2359
+## 3 3          200601         1          0        200601      31     2359
+## 4 4          200601         1          0        200601      31     2359
+## 5 5          200601         1          0        200601      31     2359
+##   EPISODE_ID EVENT_ID    STATE STATE_FIPS YEAR MONTH_NAME
+## 1    1207534  5501658  INDIANA         18 2006      April
+## 2    1202408  5482463 COLORADO          8 2006    January
+## 3    1202408  5482464 COLORADO          8 2006    January
+## 4    1202408  5482465 COLORADO          8 2006    January
+## 5    1202408  5482466 COLORADO          8 2006    January
+##          EVENT_TYPE CZ_TYPE CZ_FIPS                    CZ_NAME WFO
+## 1 Thunderstorm Wind       C      51                     GIBSON PAH
+## 2           Drought       Z       2  CENTRAL YAMPA RIVER BASIN GJT
+## 3           Drought       Z       7   DEBEQUE TO SILT CORRIDOR GJT
+## 4           Drought       Z       4 ELKHEAD AND PARK MOUNTAINS GJT
+## 5           Drought       Z      13          FLATTOP MOUNTAINS GJT
+##      BEGIN_DATE_TIME CZ_TIMEZONE      END_DATE_TIME INJURIES_DIRECT
+## 1 07-APR-06 15:15:00         CST 07-APR-06 15:15:00               0
+## 2 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
+## 3 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
+## 4 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
+## 5 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
+##   INJURIES_INDIRECT DEATHS_DIRECT DEATHS_INDIRECT DAMAGE_PROPERTY
+## 1                 0             0               0             60K
+## 2                 0             0               0                
+## 3                 0             0               0                
+## 4                 0             0               0                
+## 5                 0             0               0                
+##   DAMAGE_CROPS         SOURCE MAGNITUDE MAGNITUDE_TYPE FLOOD_CAUSE
+## 1              GENERAL PUBLIC        61             EG            
+## 2               GOVT OFFICIAL        NA                           
+## 3               GOVT OFFICIAL        NA                           
+## 4               GOVT OFFICIAL        NA                           
+## 5               GOVT OFFICIAL        NA                           
+##   CATEGORY TOR_F_SCALE TOR_LENGTH TOR_WIDTH TOR_OTHER_WFO
+## 1       NA                     NA        NA              
+## 2       NA                     NA        NA              
+## 3       NA                     NA        NA              
+## 4       NA                     NA        NA              
+## 5       NA                     NA        NA              
+##   TOR_OTHER_CZ_STATE TOR_OTHER_CZ_FIPS TOR_OTHER_CZ_NAME BEGIN_RANGE
+## 1                                   NA                             4
+## 2                                   NA                            NA
+## 3                                   NA                            NA
+## 4                                   NA                            NA
+## 5                                   NA                            NA
+##   BEGIN_AZIMUTH BEGIN_LOCATION END_RANGE END_AZIMUTH END_LOCATION
+## 1             E         PATOKA        NA             OAKLAND CITY
+## 2                                     NA                         
+## 3                                     NA                         
+## 4                                     NA                         
+## 5                                     NA                         
+##   BEGIN_LAT BEGIN_LON END_LAT END_LON DATA_SOURCE
+## 1     38.42    -87.52   38.33  -87.35         PDS
+## 2        NA        NA      NA      NA         PDS
+## 3        NA        NA      NA      NA         PDS
+## 4        NA        NA      NA      NA         PDS
+## 5        NA        NA      NA      NA         PDS
+```
+
+```r
+# Select by column - with variable name
+myvars <- c("YEAR", "INJURIES_DIRECT", "INJURIES_INDIRECT", "DEATHS_DIRECT", "DEATHS_INDIRECT", "DAMAGE_PROPERTY", "DAMAGE_CROPS")
+impact <- stormdata[myvars]
+head(impact, n=5)
+```
+
+```
+##   YEAR INJURIES_DIRECT INJURIES_INDIRECT DEATHS_DIRECT DEATHS_INDIRECT
+## 1 2006               0                 0             0               0
+## 2 2006               0                 0             0               0
+## 3 2006               0                 0             0               0
+## 4 2006               0                 0             0               0
+## 5 2006               0                 0             0               0
+##   DAMAGE_PROPERTY DAMAGE_CROPS
+## 1             60K             
+## 2                             
+## 3                             
+## 4                             
+## 5
+```
+
+```r
+# Select by column - with column number
+newdata <- stormdata[c(1,5:10)]
+head(newdata, n=5)
+```
+
+```
+##   X END_YEARMONTH END_DAY END_TIME EPISODE_ID EVENT_ID    STATE
+## 1 1        200604       7     1515    1207534  5501658  INDIANA
+## 2 2        200601      31     2359    1202408  5482463 COLORADO
+## 3 3        200601      31     2359    1202408  5482464 COLORADO
+## 4 4        200601      31     2359    1202408  5482465 COLORADO
+## 5 5        200601      31     2359    1202408  5482466 COLORADO
+```
+
+```r
+# Select by column - exclusion by column name
+myvars <- names(stormdata) %in% c("v1", "v2", "v3")
+newdata <- stormdata[!myvars]
+head(newdata, n=5)
+```
+
+```
+##   X BEGIN_YEARMONTH BEGIN_DAY BEGIN_TIME END_YEARMONTH END_DAY END_TIME
+## 1 1          200604         7       1515        200604       7     1515
+## 2 2          200601         1          0        200601      31     2359
+## 3 3          200601         1          0        200601      31     2359
+## 4 4          200601         1          0        200601      31     2359
+## 5 5          200601         1          0        200601      31     2359
+##   EPISODE_ID EVENT_ID    STATE STATE_FIPS YEAR MONTH_NAME
+## 1    1207534  5501658  INDIANA         18 2006      April
+## 2    1202408  5482463 COLORADO          8 2006    January
+## 3    1202408  5482464 COLORADO          8 2006    January
+## 4    1202408  5482465 COLORADO          8 2006    January
+## 5    1202408  5482466 COLORADO          8 2006    January
+##          EVENT_TYPE CZ_TYPE CZ_FIPS                    CZ_NAME WFO
+## 1 Thunderstorm Wind       C      51                     GIBSON PAH
+## 2           Drought       Z       2  CENTRAL YAMPA RIVER BASIN GJT
+## 3           Drought       Z       7   DEBEQUE TO SILT CORRIDOR GJT
+## 4           Drought       Z       4 ELKHEAD AND PARK MOUNTAINS GJT
+## 5           Drought       Z      13          FLATTOP MOUNTAINS GJT
+##      BEGIN_DATE_TIME CZ_TIMEZONE      END_DATE_TIME INJURIES_DIRECT
+## 1 07-APR-06 15:15:00         CST 07-APR-06 15:15:00               0
+## 2 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
+## 3 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
+## 4 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
+## 5 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
+##   INJURIES_INDIRECT DEATHS_DIRECT DEATHS_INDIRECT DAMAGE_PROPERTY
+## 1                 0             0               0             60K
+## 2                 0             0               0                
+## 3                 0             0               0                
+## 4                 0             0               0                
+## 5                 0             0               0                
+##   DAMAGE_CROPS         SOURCE MAGNITUDE MAGNITUDE_TYPE FLOOD_CAUSE
+## 1              GENERAL PUBLIC        61             EG            
+## 2               GOVT OFFICIAL        NA                           
+## 3               GOVT OFFICIAL        NA                           
+## 4               GOVT OFFICIAL        NA                           
+## 5               GOVT OFFICIAL        NA                           
+##   CATEGORY TOR_F_SCALE TOR_LENGTH TOR_WIDTH TOR_OTHER_WFO
+## 1       NA                     NA        NA              
+## 2       NA                     NA        NA              
+## 3       NA                     NA        NA              
+## 4       NA                     NA        NA              
+## 5       NA                     NA        NA              
+##   TOR_OTHER_CZ_STATE TOR_OTHER_CZ_FIPS TOR_OTHER_CZ_NAME BEGIN_RANGE
+## 1                                   NA                             4
+## 2                                   NA                            NA
+## 3                                   NA                            NA
+## 4                                   NA                            NA
+## 5                                   NA                            NA
+##   BEGIN_AZIMUTH BEGIN_LOCATION END_RANGE END_AZIMUTH END_LOCATION
+## 1             E         PATOKA        NA             OAKLAND CITY
+## 2                                     NA                         
+## 3                                     NA                         
+## 4                                     NA                         
+## 5                                     NA                         
+##   BEGIN_LAT BEGIN_LON END_LAT END_LON DATA_SOURCE
+## 1     38.42    -87.52   38.33  -87.35         PDS
+## 2        NA        NA      NA      NA         PDS
+## 3        NA        NA      NA      NA         PDS
+## 4        NA        NA      NA      NA         PDS
+## 5        NA        NA      NA      NA         PDS
+```
+
+```r
+# Select by column - exclusion by coumn number
+newdata <- stormdata[c(-3,-5)]
+head(newdata, n=5)
+```
+
+```
+##   X BEGIN_YEARMONTH BEGIN_TIME END_DAY END_TIME EPISODE_ID EVENT_ID
+## 1 1          200604       1515       7     1515    1207534  5501658
+## 2 2          200601          0      31     2359    1202408  5482463
+## 3 3          200601          0      31     2359    1202408  5482464
+## 4 4          200601          0      31     2359    1202408  5482465
+## 5 5          200601          0      31     2359    1202408  5482466
+##      STATE STATE_FIPS YEAR MONTH_NAME        EVENT_TYPE CZ_TYPE CZ_FIPS
+## 1  INDIANA         18 2006      April Thunderstorm Wind       C      51
+## 2 COLORADO          8 2006    January           Drought       Z       2
+## 3 COLORADO          8 2006    January           Drought       Z       7
+## 4 COLORADO          8 2006    January           Drought       Z       4
+## 5 COLORADO          8 2006    January           Drought       Z      13
+##                      CZ_NAME WFO    BEGIN_DATE_TIME CZ_TIMEZONE
+## 1                     GIBSON PAH 07-APR-06 15:15:00         CST
+## 2  CENTRAL YAMPA RIVER BASIN GJT 01-JAN-06 00:00:00         MST
+## 3   DEBEQUE TO SILT CORRIDOR GJT 01-JAN-06 00:00:00         MST
+## 4 ELKHEAD AND PARK MOUNTAINS GJT 01-JAN-06 00:00:00         MST
+## 5          FLATTOP MOUNTAINS GJT 01-JAN-06 00:00:00         MST
+##        END_DATE_TIME INJURIES_DIRECT INJURIES_INDIRECT DEATHS_DIRECT
+## 1 07-APR-06 15:15:00               0                 0             0
+## 2 31-JAN-06 23:59:00               0                 0             0
+## 3 31-JAN-06 23:59:00               0                 0             0
+## 4 31-JAN-06 23:59:00               0                 0             0
+## 5 31-JAN-06 23:59:00               0                 0             0
+##   DEATHS_INDIRECT DAMAGE_PROPERTY DAMAGE_CROPS         SOURCE MAGNITUDE
+## 1               0             60K              GENERAL PUBLIC        61
+## 2               0                               GOVT OFFICIAL        NA
+## 3               0                               GOVT OFFICIAL        NA
+## 4               0                               GOVT OFFICIAL        NA
+## 5               0                               GOVT OFFICIAL        NA
+##   MAGNITUDE_TYPE FLOOD_CAUSE CATEGORY TOR_F_SCALE TOR_LENGTH TOR_WIDTH
+## 1             EG                   NA                     NA        NA
+## 2                                  NA                     NA        NA
+## 3                                  NA                     NA        NA
+## 4                                  NA                     NA        NA
+## 5                                  NA                     NA        NA
+##   TOR_OTHER_WFO TOR_OTHER_CZ_STATE TOR_OTHER_CZ_FIPS TOR_OTHER_CZ_NAME
+## 1                                                 NA                  
+## 2                                                 NA                  
+## 3                                                 NA                  
+## 4                                                 NA                  
+## 5                                                 NA                  
+##   BEGIN_RANGE BEGIN_AZIMUTH BEGIN_LOCATION END_RANGE END_AZIMUTH
+## 1           4             E         PATOKA        NA            
+## 2          NA                                     NA            
+## 3          NA                                     NA            
+## 4          NA                                     NA            
+## 5          NA                                     NA            
+##   END_LOCATION BEGIN_LAT BEGIN_LON END_LAT END_LON DATA_SOURCE
+## 1 OAKLAND CITY     38.42    -87.52   38.33  -87.35         PDS
+## 2                     NA        NA      NA      NA         PDS
+## 3                     NA        NA      NA      NA         PDS
+## 4                     NA        NA      NA      NA         PDS
+## 5                     NA        NA      NA      NA         PDS
+```
+
+```r
+# Select by column - delete variables v3 and v5
+#mydata$v3 <- mydata$v5 <- NULL
+
+
+
+# Select by Observation - first 5 observations
+newdata <- impact[1:5,]
+head(newdata, n=10)
+```
+
+```
+##   YEAR INJURIES_DIRECT INJURIES_INDIRECT DEATHS_DIRECT DEATHS_INDIRECT
+## 1 2006               0                 0             0               0
+## 2 2006               0                 0             0               0
+## 3 2006               0                 0             0               0
+## 4 2006               0                 0             0               0
+## 5 2006               0                 0             0               0
+##   DAMAGE_PROPERTY DAMAGE_CROPS
+## 1             60K             
+## 2                             
+## 3                             
+## 4                             
+## 5
+```
+
+```r
+# Select by Observation - based on variables values
+newdata <- impact[ which(impact$year==2006), ]
+head(newdata, n=10)
+```
+
+```
+## [1] YEAR              INJURIES_DIRECT   INJURIES_INDIRECT DEATHS_DIRECT    
+## [5] DEATHS_INDIRECT   DAMAGE_PROPERTY   DAMAGE_CROPS     
+## <0 rows> (or 0-length row.names)
+```
+
+```r
+# Select by Observation - using subset function
+newdata <- subset(impact, impact$year==2010, select=c(DAMAGE_PROPERTY, DAMAGE_CROPS))
+head(newdata, n=10)
+```
+
+```
+## [1] DAMAGE_PROPERTY DAMAGE_CROPS   
+## <0 rows> (or 0-length row.names)
+```
 
 

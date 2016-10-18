@@ -120,14 +120,48 @@ barplot(counts, main="Storm Event Type", horiz=TRUE, xlab="Frequency", names.arg
 
 The exercises in the *Initial Table Exploration and Observation* section allowed us to conduct some basic observations about the data set as a whole.  This is helpful yet when you browse the data and to gain a general understanding of the table content.  Now you may want to extract data into a subset (ie. to extract data by eliminating additional columns or to even extract information based on specific observations.)  Sub-setting is similar to strategies whereby one might execute a SQL SELECT statement from a database.  The difference here now with R is that our main data frame is sitting in memory.  We can now take pieces of this data set and conduct separate analysis.
 
+We will follow some instructions as outlined on the following webpage <http://www.statmethods.net/management/subset.html>
+
+
 ```{r}
 
-# Select by column
+# Create visualization of the header of the unmodified file
+head(stormdata, n=5)
+
+# Select by column - with variable name
 myvars <- c("YEAR", "INJURIES_DIRECT", "INJURIES_INDIRECT", "DEATHS_DIRECT", "DEATHS_INDIRECT", "DAMAGE_PROPERTY", "DAMAGE_CROPS")
 impact <- stormdata[myvars]
+head(impact, n=5)
+
+# Select by column - with column number
+newdata <- stormdata[c(1,5:10)]
+head(newdata, n=5)
+
+# Select by column - exclusion by column name
+myvars <- names(stormdata) %in% c("v1", "v2", "v3")
+newdata <- stormdata[!myvars]
+head(newdata, n=5)
+
+# Select by column - exclusion by coumn number
+newdata <- stormdata[c(-3,-5)]
+head(newdata, n=5)
+
+# Select by column - delete variables v3 and v5
+#mydata$v3 <- mydata$v5 <- NULL
 
 
 
+# Select by Observation - first 5 observations
+newdata <- impact[1:5,]
+head(newdata, n=10)
+
+# Select by Observation - based on variables values
+newdata <- impact[ which(impact$year==2006), ]
+head(newdata, n=10)
+
+# Select by Observation - using subset function
+newdata <- subset(impact, impact$year==2010, select=c(DAMAGE_PROPERTY, DAMAGE_CROPS))
+head(newdata, n=10)
 
 ```
 

@@ -68,6 +68,10 @@ img {
 </div>
 
 
+<div id="ncdc-storm-events-database-analysis" class="section level1">
+<h1>NCDC Storm Events Database Analysis</h1>
+<div id="get-and-clean-data-from-data.gov" class="section level2">
+<h2>Get and Clean Data from DATA.gov</h2>
 <p>I am an MBA student at Bridgewater State University, enrolled in MGMT582 - Business Intelligence/Analytics. This data exploration project is intended to be my final project and in-class presentation. The goal of this project is to gain practical working experience with R Studio and to apply some data analysis techniques in which we have been introduced within this course.</p>
 <p>I have chosen to work with the NCDC Storm Events Database available at DATA.gov. For more details related to this raw data set, see <a href="https://catalog.data.gov/dataset/ncdc-storm-events-database" class="uri">https://catalog.data.gov/dataset/ncdc-storm-events-database</a>.</p>
 <p>My first step in preparing my analysis will be to write a script to get the data at Data.gov. After following instructions about the storm events database, I found that the raw data sits in zipped files located on an FTP server at <a href="ftp://ftp.ncdc.noaa.gov/pub/data/swdi/stormevents/csvfiles/" class="uri">ftp://ftp.ncdc.noaa.gov/pub/data/swdi/stormevents/csvfiles/</a>. I am going to attempt to write a script that will automatically get this data from its FTP location, unzip each file, and then append it to create a larger file that can be analyzed here with R Studio.</p>
@@ -125,6 +129,9 @@ img {
 } else if (!exists(&quot;stormdata&quot;)) {
     stormdata &lt;- read.csv(&quot;./stormdata.csv&quot;)
 }</code></pre>
+</div>
+<div id="initial-table-exploration-and-observation" class="section level2">
+<h2>Initial Table Exploration and Observation</h2>
 <p>The script above has successfully assembled 10+ years of data from the NCDC Storm Events Database from calendar year 2006 through summer of 2016. We have eliminated the long text fields related to the description of the storm events. We did this in order to produce a table size which is manageable on our desktop computers. Elimination of these text fields dropped the file size to nearly 25% of its original size. Our final CSV file is appx 193MB in size and it contains 656K observations of 50 variables.</p>
 <p>It is now desirable to conduct some exploration techniques as outlined on RDatamining.com. We will follow the examples put forth on the following page in order to begin our exploration of this significant data file.</p>
 <p><a href="http://www.rdatamining.com/examples/exploration" class="uri">http://www.rdatamining.com/examples/exploration</a></p>
@@ -421,6 +428,252 @@ pie(counts)</code></pre>
 <pre class="r"><code># Simple Horizontal Bar Plot
 barplot(counts, main=&quot;Storm Event Type&quot;, horiz=TRUE, xlab=&quot;Frequency&quot;, names.arg=names(counts), cex.names=0.5, las=1)</code></pre>
 <p><img src="data:image/png;base64,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" /></p>
+</div>
+<div id="table-sub-setting" class="section level2">
+<h2>Table Sub-Setting</h2>
+<p>The exercises in the <em>Initial Table Exploration and Observation</em> section allowed us to conduct some basic observations about the data set as a whole. This is helpful yet when you browse the data and to gain a general understanding of the table content. Now you may want to extract data into a subset (ie. to extract data by eliminating additional columns or to even extract information based on specific observations.) Sub-setting is similar to strategies whereby one might execute a SQL SELECT statement from a database. The difference here now with R is that our main data frame is sitting in memory. We can now take pieces of this data set and conduct separate analysis.</p>
+<p>We will follow some instructions as outlined on the following webpage <a href="http://www.statmethods.net/management/subset.html" class="uri">http://www.statmethods.net/management/subset.html</a></p>
+<pre class="r"><code># Create visualization of the header of the unmodified file
+head(stormdata, n=5)</code></pre>
+<pre><code>##   X BEGIN_YEARMONTH BEGIN_DAY BEGIN_TIME END_YEARMONTH END_DAY END_TIME
+## 1 1          200604         7       1515        200604       7     1515
+## 2 2          200601         1          0        200601      31     2359
+## 3 3          200601         1          0        200601      31     2359
+## 4 4          200601         1          0        200601      31     2359
+## 5 5          200601         1          0        200601      31     2359
+##   EPISODE_ID EVENT_ID    STATE STATE_FIPS YEAR MONTH_NAME
+## 1    1207534  5501658  INDIANA         18 2006      April
+## 2    1202408  5482463 COLORADO          8 2006    January
+## 3    1202408  5482464 COLORADO          8 2006    January
+## 4    1202408  5482465 COLORADO          8 2006    January
+## 5    1202408  5482466 COLORADO          8 2006    January
+##          EVENT_TYPE CZ_TYPE CZ_FIPS                    CZ_NAME WFO
+## 1 Thunderstorm Wind       C      51                     GIBSON PAH
+## 2           Drought       Z       2  CENTRAL YAMPA RIVER BASIN GJT
+## 3           Drought       Z       7   DEBEQUE TO SILT CORRIDOR GJT
+## 4           Drought       Z       4 ELKHEAD AND PARK MOUNTAINS GJT
+## 5           Drought       Z      13          FLATTOP MOUNTAINS GJT
+##      BEGIN_DATE_TIME CZ_TIMEZONE      END_DATE_TIME INJURIES_DIRECT
+## 1 07-APR-06 15:15:00         CST 07-APR-06 15:15:00               0
+## 2 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
+## 3 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
+## 4 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
+## 5 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
+##   INJURIES_INDIRECT DEATHS_DIRECT DEATHS_INDIRECT DAMAGE_PROPERTY
+## 1                 0             0               0             60K
+## 2                 0             0               0                
+## 3                 0             0               0                
+## 4                 0             0               0                
+## 5                 0             0               0                
+##   DAMAGE_CROPS         SOURCE MAGNITUDE MAGNITUDE_TYPE FLOOD_CAUSE
+## 1              GENERAL PUBLIC        61             EG            
+## 2               GOVT OFFICIAL        NA                           
+## 3               GOVT OFFICIAL        NA                           
+## 4               GOVT OFFICIAL        NA                           
+## 5               GOVT OFFICIAL        NA                           
+##   CATEGORY TOR_F_SCALE TOR_LENGTH TOR_WIDTH TOR_OTHER_WFO
+## 1       NA                     NA        NA              
+## 2       NA                     NA        NA              
+## 3       NA                     NA        NA              
+## 4       NA                     NA        NA              
+## 5       NA                     NA        NA              
+##   TOR_OTHER_CZ_STATE TOR_OTHER_CZ_FIPS TOR_OTHER_CZ_NAME BEGIN_RANGE
+## 1                                   NA                             4
+## 2                                   NA                            NA
+## 3                                   NA                            NA
+## 4                                   NA                            NA
+## 5                                   NA                            NA
+##   BEGIN_AZIMUTH BEGIN_LOCATION END_RANGE END_AZIMUTH END_LOCATION
+## 1             E         PATOKA        NA             OAKLAND CITY
+## 2                                     NA                         
+## 3                                     NA                         
+## 4                                     NA                         
+## 5                                     NA                         
+##   BEGIN_LAT BEGIN_LON END_LAT END_LON DATA_SOURCE
+## 1     38.42    -87.52   38.33  -87.35         PDS
+## 2        NA        NA      NA      NA         PDS
+## 3        NA        NA      NA      NA         PDS
+## 4        NA        NA      NA      NA         PDS
+## 5        NA        NA      NA      NA         PDS</code></pre>
+<pre class="r"><code># Select by column - with variable name
+myvars &lt;- c(&quot;YEAR&quot;, &quot;INJURIES_DIRECT&quot;, &quot;INJURIES_INDIRECT&quot;, &quot;DEATHS_DIRECT&quot;, &quot;DEATHS_INDIRECT&quot;, &quot;DAMAGE_PROPERTY&quot;, &quot;DAMAGE_CROPS&quot;)
+impact &lt;- stormdata[myvars]
+head(impact, n=5)</code></pre>
+<pre><code>##   YEAR INJURIES_DIRECT INJURIES_INDIRECT DEATHS_DIRECT DEATHS_INDIRECT
+## 1 2006               0                 0             0               0
+## 2 2006               0                 0             0               0
+## 3 2006               0                 0             0               0
+## 4 2006               0                 0             0               0
+## 5 2006               0                 0             0               0
+##   DAMAGE_PROPERTY DAMAGE_CROPS
+## 1             60K             
+## 2                             
+## 3                             
+## 4                             
+## 5</code></pre>
+<pre class="r"><code># Select by column - with column number
+newdata &lt;- stormdata[c(1,5:10)]
+head(newdata, n=5)</code></pre>
+<pre><code>##   X END_YEARMONTH END_DAY END_TIME EPISODE_ID EVENT_ID    STATE
+## 1 1        200604       7     1515    1207534  5501658  INDIANA
+## 2 2        200601      31     2359    1202408  5482463 COLORADO
+## 3 3        200601      31     2359    1202408  5482464 COLORADO
+## 4 4        200601      31     2359    1202408  5482465 COLORADO
+## 5 5        200601      31     2359    1202408  5482466 COLORADO</code></pre>
+<pre class="r"><code># Select by column - exclusion by column name
+myvars &lt;- names(stormdata) %in% c(&quot;v1&quot;, &quot;v2&quot;, &quot;v3&quot;)
+newdata &lt;- stormdata[!myvars]
+head(newdata, n=5)</code></pre>
+<pre><code>##   X BEGIN_YEARMONTH BEGIN_DAY BEGIN_TIME END_YEARMONTH END_DAY END_TIME
+## 1 1          200604         7       1515        200604       7     1515
+## 2 2          200601         1          0        200601      31     2359
+## 3 3          200601         1          0        200601      31     2359
+## 4 4          200601         1          0        200601      31     2359
+## 5 5          200601         1          0        200601      31     2359
+##   EPISODE_ID EVENT_ID    STATE STATE_FIPS YEAR MONTH_NAME
+## 1    1207534  5501658  INDIANA         18 2006      April
+## 2    1202408  5482463 COLORADO          8 2006    January
+## 3    1202408  5482464 COLORADO          8 2006    January
+## 4    1202408  5482465 COLORADO          8 2006    January
+## 5    1202408  5482466 COLORADO          8 2006    January
+##          EVENT_TYPE CZ_TYPE CZ_FIPS                    CZ_NAME WFO
+## 1 Thunderstorm Wind       C      51                     GIBSON PAH
+## 2           Drought       Z       2  CENTRAL YAMPA RIVER BASIN GJT
+## 3           Drought       Z       7   DEBEQUE TO SILT CORRIDOR GJT
+## 4           Drought       Z       4 ELKHEAD AND PARK MOUNTAINS GJT
+## 5           Drought       Z      13          FLATTOP MOUNTAINS GJT
+##      BEGIN_DATE_TIME CZ_TIMEZONE      END_DATE_TIME INJURIES_DIRECT
+## 1 07-APR-06 15:15:00         CST 07-APR-06 15:15:00               0
+## 2 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
+## 3 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
+## 4 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
+## 5 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
+##   INJURIES_INDIRECT DEATHS_DIRECT DEATHS_INDIRECT DAMAGE_PROPERTY
+## 1                 0             0               0             60K
+## 2                 0             0               0                
+## 3                 0             0               0                
+## 4                 0             0               0                
+## 5                 0             0               0                
+##   DAMAGE_CROPS         SOURCE MAGNITUDE MAGNITUDE_TYPE FLOOD_CAUSE
+## 1              GENERAL PUBLIC        61             EG            
+## 2               GOVT OFFICIAL        NA                           
+## 3               GOVT OFFICIAL        NA                           
+## 4               GOVT OFFICIAL        NA                           
+## 5               GOVT OFFICIAL        NA                           
+##   CATEGORY TOR_F_SCALE TOR_LENGTH TOR_WIDTH TOR_OTHER_WFO
+## 1       NA                     NA        NA              
+## 2       NA                     NA        NA              
+## 3       NA                     NA        NA              
+## 4       NA                     NA        NA              
+## 5       NA                     NA        NA              
+##   TOR_OTHER_CZ_STATE TOR_OTHER_CZ_FIPS TOR_OTHER_CZ_NAME BEGIN_RANGE
+## 1                                   NA                             4
+## 2                                   NA                            NA
+## 3                                   NA                            NA
+## 4                                   NA                            NA
+## 5                                   NA                            NA
+##   BEGIN_AZIMUTH BEGIN_LOCATION END_RANGE END_AZIMUTH END_LOCATION
+## 1             E         PATOKA        NA             OAKLAND CITY
+## 2                                     NA                         
+## 3                                     NA                         
+## 4                                     NA                         
+## 5                                     NA                         
+##   BEGIN_LAT BEGIN_LON END_LAT END_LON DATA_SOURCE
+## 1     38.42    -87.52   38.33  -87.35         PDS
+## 2        NA        NA      NA      NA         PDS
+## 3        NA        NA      NA      NA         PDS
+## 4        NA        NA      NA      NA         PDS
+## 5        NA        NA      NA      NA         PDS</code></pre>
+<pre class="r"><code># Select by column - exclusion by coumn number
+newdata &lt;- stormdata[c(-3,-5)]
+head(newdata, n=5)</code></pre>
+<pre><code>##   X BEGIN_YEARMONTH BEGIN_TIME END_DAY END_TIME EPISODE_ID EVENT_ID
+## 1 1          200604       1515       7     1515    1207534  5501658
+## 2 2          200601          0      31     2359    1202408  5482463
+## 3 3          200601          0      31     2359    1202408  5482464
+## 4 4          200601          0      31     2359    1202408  5482465
+## 5 5          200601          0      31     2359    1202408  5482466
+##      STATE STATE_FIPS YEAR MONTH_NAME        EVENT_TYPE CZ_TYPE CZ_FIPS
+## 1  INDIANA         18 2006      April Thunderstorm Wind       C      51
+## 2 COLORADO          8 2006    January           Drought       Z       2
+## 3 COLORADO          8 2006    January           Drought       Z       7
+## 4 COLORADO          8 2006    January           Drought       Z       4
+## 5 COLORADO          8 2006    January           Drought       Z      13
+##                      CZ_NAME WFO    BEGIN_DATE_TIME CZ_TIMEZONE
+## 1                     GIBSON PAH 07-APR-06 15:15:00         CST
+## 2  CENTRAL YAMPA RIVER BASIN GJT 01-JAN-06 00:00:00         MST
+## 3   DEBEQUE TO SILT CORRIDOR GJT 01-JAN-06 00:00:00         MST
+## 4 ELKHEAD AND PARK MOUNTAINS GJT 01-JAN-06 00:00:00         MST
+## 5          FLATTOP MOUNTAINS GJT 01-JAN-06 00:00:00         MST
+##        END_DATE_TIME INJURIES_DIRECT INJURIES_INDIRECT DEATHS_DIRECT
+## 1 07-APR-06 15:15:00               0                 0             0
+## 2 31-JAN-06 23:59:00               0                 0             0
+## 3 31-JAN-06 23:59:00               0                 0             0
+## 4 31-JAN-06 23:59:00               0                 0             0
+## 5 31-JAN-06 23:59:00               0                 0             0
+##   DEATHS_INDIRECT DAMAGE_PROPERTY DAMAGE_CROPS         SOURCE MAGNITUDE
+## 1               0             60K              GENERAL PUBLIC        61
+## 2               0                               GOVT OFFICIAL        NA
+## 3               0                               GOVT OFFICIAL        NA
+## 4               0                               GOVT OFFICIAL        NA
+## 5               0                               GOVT OFFICIAL        NA
+##   MAGNITUDE_TYPE FLOOD_CAUSE CATEGORY TOR_F_SCALE TOR_LENGTH TOR_WIDTH
+## 1             EG                   NA                     NA        NA
+## 2                                  NA                     NA        NA
+## 3                                  NA                     NA        NA
+## 4                                  NA                     NA        NA
+## 5                                  NA                     NA        NA
+##   TOR_OTHER_WFO TOR_OTHER_CZ_STATE TOR_OTHER_CZ_FIPS TOR_OTHER_CZ_NAME
+## 1                                                 NA                  
+## 2                                                 NA                  
+## 3                                                 NA                  
+## 4                                                 NA                  
+## 5                                                 NA                  
+##   BEGIN_RANGE BEGIN_AZIMUTH BEGIN_LOCATION END_RANGE END_AZIMUTH
+## 1           4             E         PATOKA        NA            
+## 2          NA                                     NA            
+## 3          NA                                     NA            
+## 4          NA                                     NA            
+## 5          NA                                     NA            
+##   END_LOCATION BEGIN_LAT BEGIN_LON END_LAT END_LON DATA_SOURCE
+## 1 OAKLAND CITY     38.42    -87.52   38.33  -87.35         PDS
+## 2                     NA        NA      NA      NA         PDS
+## 3                     NA        NA      NA      NA         PDS
+## 4                     NA        NA      NA      NA         PDS
+## 5                     NA        NA      NA      NA         PDS</code></pre>
+<pre class="r"><code># Select by column - delete variables v3 and v5
+#mydata$v3 &lt;- mydata$v5 &lt;- NULL
+
+
+
+# Select by Observation - first 5 observations
+newdata &lt;- impact[1:5,]
+head(newdata, n=10)</code></pre>
+<pre><code>##   YEAR INJURIES_DIRECT INJURIES_INDIRECT DEATHS_DIRECT DEATHS_INDIRECT
+## 1 2006               0                 0             0               0
+## 2 2006               0                 0             0               0
+## 3 2006               0                 0             0               0
+## 4 2006               0                 0             0               0
+## 5 2006               0                 0             0               0
+##   DAMAGE_PROPERTY DAMAGE_CROPS
+## 1             60K             
+## 2                             
+## 3                             
+## 4                             
+## 5</code></pre>
+<pre class="r"><code># Select by Observation - based on variables values
+newdata &lt;- impact[ which(impact$year==2006), ]
+head(newdata, n=10)</code></pre>
+<pre><code>## [1] YEAR              INJURIES_DIRECT   INJURIES_INDIRECT DEATHS_DIRECT    
+## [5] DEATHS_INDIRECT   DAMAGE_PROPERTY   DAMAGE_CROPS     
+## &lt;0 rows&gt; (or 0-length row.names)</code></pre>
+<pre class="r"><code># Select by Observation - using subset function
+newdata &lt;- subset(impact, impact$year==2010, select=c(DAMAGE_PROPERTY, DAMAGE_CROPS))
+head(newdata, n=10)</code></pre>
+<pre><code>## [1] DAMAGE_PROPERTY DAMAGE_CROPS   
+## &lt;0 rows&gt; (or 0-length row.names)</code></pre>
+</div>
+</div>
 
 
 </div>
