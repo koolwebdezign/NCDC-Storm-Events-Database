@@ -436,7 +436,7 @@ SELECT YEAR, COUNT(*)
 # Subset the stormdata data frame
 thunderstorms <- stormdata[stormdata$EVENT_TYPE=="Thunderstorm Wind",c('YEAR', 'EVENT_TYPE', 'INJURIES_DIRECT', 'INJURIES_INDIRECT', 'DEATHS_DIRECT', 'DEATHS_INDIRECT', 'DAMAGE_PROPERTY', 'DAMAGE_CROPS', 'MAGNITUDE', 'MAGNITUDE_TYPE')] %>% group_by(YEAR) %>% summarise(number = n())
 
-# Creat Simple Plot
+# Create Simple Plot
 plot(thunderstorms$YEAR, thunderstorms$number, type="p", main="Thunderstorms", xlab="Year", ylab="Number of Events")
 ```
 
@@ -449,7 +449,7 @@ plot(thunderstorms$YEAR, thunderstorms$number, type="p", main="Thunderstorms", x
 # Subset the stormdata data frame
 hailstorms <- stormdata[stormdata$EVENT_TYPE=="Hail",c('YEAR', 'EVENT_TYPE', 'INJURIES_DIRECT', 'INJURIES_INDIRECT', 'DEATHS_DIRECT', 'DEATHS_INDIRECT', 'DAMAGE_PROPERTY', 'DAMAGE_CROPS', 'MAGNITUDE', 'MAGNITUDE_TYPE')] %>% group_by(YEAR) %>% summarise(number = n())
 
-# Creat Simple Plot
+# Create Simple Plot
 plot(hailstorms$YEAR, hailstorms$number, type="p", main="Hail Storms", xlab="Year", ylab="Number of Events")
 ```
 
@@ -462,7 +462,7 @@ plot(hailstorms$YEAR, hailstorms$number, type="p", main="Hail Storms", xlab="Yea
 # Subset the stormdata data frame
 tornados <- stormdata[stormdata$EVENT_TYPE=="Tornado",c('YEAR', 'EVENT_TYPE', 'INJURIES_DIRECT', 'INJURIES_INDIRECT', 'DEATHS_DIRECT', 'DEATHS_INDIRECT', 'DAMAGE_PROPERTY', 'DAMAGE_CROPS', 'MAGNITUDE', 'MAGNITUDE_TYPE')] %>% group_by(YEAR) %>% summarise(number = n())
 
-# Creat Simple Plot
+# Create Simple Plot
 plot(tornados$YEAR, tornados$number, type="p", main="Tornados", xlab="Year", ylab="Number of Events")
 ```
 
@@ -475,7 +475,7 @@ plot(tornados$YEAR, tornados$number, type="p", main="Tornados", xlab="Year", yla
 # Subset the stormdata data frame
 winterstorms <- stormdata[stormdata$EVENT_TYPE=="Winter Storm",c('YEAR', 'EVENT_TYPE', 'INJURIES_DIRECT', 'INJURIES_INDIRECT', 'DEATHS_DIRECT', 'DEATHS_INDIRECT', 'DAMAGE_PROPERTY', 'DAMAGE_CROPS', 'MAGNITUDE', 'MAGNITUDE_TYPE')] %>% group_by(YEAR) %>% summarise(number = n())
 
-# Creat Simple Plot
+# Create Simple Plot
 plot(winterstorms$YEAR, winterstorms$number, type="p", main="Winter Storms", xlab="Year", ylab="Number of Events")
 ```
 
@@ -488,7 +488,7 @@ plot(winterstorms$YEAR, winterstorms$number, type="p", main="Winter Storms", xla
 # Subset the stormdata data frame
 snowstorms <- stormdata[stormdata$EVENT_TYPE=="Heavy Snow",c('YEAR', 'EVENT_TYPE', 'INJURIES_DIRECT', 'INJURIES_INDIRECT', 'DEATHS_DIRECT', 'DEATHS_INDIRECT', 'DAMAGE_PROPERTY', 'DAMAGE_CROPS', 'MAGNITUDE', 'MAGNITUDE_TYPE')] %>% group_by(YEAR) %>% summarise(number = n())
 
-# Creat Simple Plot
+# Create Simple Plot
 plot(snowstorms$YEAR, snowstorms$number, type="p", main="Snow Storms", xlab="Year", ylab="Number of Events")
 ```
 
