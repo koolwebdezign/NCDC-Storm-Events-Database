@@ -9,13 +9,25 @@ output:
 
 # NCDC Storm Events Database Analysis
 
-## Get and Clean Data from DATA.gov
+## Get Data from DATA.gov
 
 I am an MBA student at Bridgewater State University, enrolled in MGMT582 - Business Intelligence/Analytics.  This data exploration project is intended to be my final project and in-class presentation.  The goal of this project is to gain practical working experience with R Studio and to apply some data analysis techniques in which we have been introduced within this course.
 
 I have chosen to work with the NCDC Storm Events Database available at DATA.gov.  For more details related to this raw data set, see <https://catalog.data.gov/dataset/ncdc-storm-events-database>.
 
-My first step in preparing my analysis will be to write a script to get the data at Data.gov.  After following instructions about the storm events database, I found that the raw data sits in zipped files located on an FTP server at <ftp://ftp.ncdc.noaa.gov/pub/data/swdi/stormevents/csvfiles/>.  I am going to attempt to write a script that will automatically get this data from its FTP location, unzip each file, and then append it to create a larger file that can be analyzed here with R Studio.
+My first step in preparing my analysis will be to write a script to get the data at Data.gov.  After following instructions about the storm events database, I found that the raw data sits in zipped files located on an FTP server at <ftp://ftp.ncdc.noaa.gov/pub/data/swdi/stormevents/csvfiles/>.  I have prepared a script that will automatically get this data from its FTP location, unzip each file, and then append it to create a larger file that can be analyzed here with R Studio.  The development of this script was an iterative process, as I needed to be cautious of memory requirements.  
+
+With my first pass at the collection of data from Data.gov, I collected 10 years of data back to 2006.  I found that my personal computer could handle this task and the stormdata.csv file was approximately 200MB in size.  Since my computer has nearly 8GB of RAM, I decided to go ahead and collect a full 65 years of storm data.  After pulling 65 years of data, I observed that my final stormdata.csv file was only 400MB in size.  This appears to be a very manageable data set that can be conveniently explored here with R Studio.
+
+Now, the process of collecting this data via FTP, downloading, unzipping, and then concatenating each of the individual files is quite timely and it is not necessary to do all of this work with each and every execution of the Knitr markdown script.  To aid in the data exploration process, I will introduce caching into R Studio with the script as follows:
+
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(cache=TRUE)
+```
+
+Let's now iterate through 65 years of storm data, collect this data via download from the public FTP site, concatenate the data into a larger data set, and store a copy of this file locally on our computer.
+
 
 ```{r}
 if (!file.exists("./stormdata.csv")) {
@@ -24,12 +36,10 @@ if (!file.exists("./stormdata.csv")) {
     
     i <- 1
 
-    for (year in 2006:2016) {
+    for (year in 1951:2016) {
         # Determine file name extension
-        if (year==2014) {
-            extstr <- "_c20160617.csv.gz"
-        } else if (year==2015 || year==2016) {
-            extstr <- "_c20160921.csv.gz"
+        if (year==2006 || year==2014 || year==2015 || year==2016) {
+            extstr <- "_c20161118.csv.gz"
         } else {
             extstr <- "_c20160223.csv.gz"
         }
@@ -76,7 +86,7 @@ if (!file.exists("./stormdata.csv")) {
 ```
 ## Initial Table Exploration and Observation
 
-The script above has successfully assembled 10+ years of data from the NCDC Storm Events Database from calendar year 2006 through summer of 2016.  We have eliminated the long text fields related to the description of the storm events.  We did this in order to produce a table size which is manageable on our desktop computers.  Elimination of these text fields dropped the file size to nearly 25% of its original size.  Our final CSV file is appx 193MB in size and it contains 656K observations of 50 variables.
+The script above has successfully assembled 65 years of data from the NCDC Storm Events Database from calendar year 1951 through summer of 2016.  We have eliminated the long text fields related to the description of the storm events.  We did this in order to produce a table size which is manageable on our desktop computers.  Elimination of these text fields dropped the file size to nearly 25% of its original size.  Our final CSV file is appx 400MB in size and it contains 1,401,817 observations of 50 variables.
 
 It is now desirable to conduct some exploration techniques as outlined on RDatamining.com.  We will follow the examples put forth on the following page in order to begin our exploration of this significant data file.
 
@@ -102,8 +112,18 @@ head(stormdata, n=5)
 # Distribution of every variable
 summary(stormdata)
 
-# Frequency of event types
-counts <- sort(table(stormdata$EVENT_TYPE), decreasing=TRUE)
+```
+
+## Introduction to the Table() Function
+
+According to R-Bloggers.com <https://www.r-bloggers.com/r-function-of-the-day-table/>, "the table() function is a very basic, but essential, function to master while performing interactive data analyses.  It simply creates tabular results of categorical variables.  However, when combined with the powers of logical expressions in R, you can gain even more insights into your data, including identifying potential problems.
+
+```{r}
+# Frequency of event types - sorted by decreasing count and selected for top 10 events.
+counts <- sort(table(stormdata$EVENT_TYPE), decreasing=TRUE)[1:10]
+
+# Output the first 5 rows of the file
+head(counts, n=25)
 
 # Get the names of columns on counts table
 names(counts)
@@ -116,53 +136,76 @@ barplot(counts, main="Storm Event Type", horiz=TRUE, xlab="Frequency", names.arg
 
 ```
 
-## Table Sub-Setting
+## Trend Analysis
 
-The exercises in the *Initial Table Exploration and Observation* section allowed us to conduct some basic observations about the data set as a whole.  This is helpful yet when you browse the data and to gain a general understanding of the table content.  Now you may want to extract data into a subset (ie. to extract data by eliminating additional columns or to even extract information based on specific observations.)  Sub-setting is similar to strategies whereby one might execute a SQL SELECT statement from a database.  The difference here now with R is that our main data frame is sitting in memory.  We can now take pieces of this data set and conduct separate analysis.
+It is now desirable to complete a trend analysis whereby we can visualize the frequency of events by year so that we can see if there is an upward trend in the number of occurrences of these major weather events.
 
-We will follow some instructions as outlined on the following webpage <http://www.statmethods.net/management/subset.html>
+I want to complete a sub-setting technique using R, such that I complete the equivalent of an SQL query like the following:
 
+SELECT YEAR, COUNT(*) 
+  FROM stormdata
+  WHERE EVENT_TYPE='Thunderstorm Wind'
+  GROUP BY YEAR
+  ORDER BY YEAR
+  
+### Thunderstorm Events
 
 ```{r}
+# Subset the stormdata data frame
+thunderstorms <- stormdata[stormdata$EVENT_TYPE=="Thunderstorm Wind",c('YEAR', 'EVENT_TYPE', 'INJURIES_DIRECT', 'INJURIES_INDIRECT', 'DEATHS_DIRECT', 'DEATHS_INDIRECT', 'DAMAGE_PROPERTY', 'DAMAGE_CROPS', 'MAGNITUDE', 'MAGNITUDE_TYPE')] %>% group_by(YEAR) %>% summarise(number = n())
 
-# Create visualization of the header of the unmodified file
-head(stormdata, n=5)
-
-# Select by column - with variable name
-myvars <- c("YEAR", "INJURIES_DIRECT", "INJURIES_INDIRECT", "DEATHS_DIRECT", "DEATHS_INDIRECT", "DAMAGE_PROPERTY", "DAMAGE_CROPS")
-impact <- stormdata[myvars]
-head(impact, n=5)
-
-# Select by column - with column number
-newdata <- stormdata[c(1,5:10)]
-head(newdata, n=5)
-
-# Select by column - exclusion by column name
-myvars <- names(stormdata) %in% c("v1", "v2", "v3")
-newdata <- stormdata[!myvars]
-head(newdata, n=5)
-
-# Select by column - exclusion by coumn number
-newdata <- stormdata[c(-3,-5)]
-head(newdata, n=5)
-
-# Select by column - delete variables v3 and v5
-#mydata$v3 <- mydata$v5 <- NULL
-
-
-
-# Select by Observation - first 5 observations
-newdata <- impact[1:5,]
-head(newdata, n=10)
-
-# Select by Observation - based on variables values
-newdata <- impact[ which(impact$year==2006), ]
-head(newdata, n=10)
-
-# Select by Observation - using subset function
-newdata <- subset(impact, impact$year==2010, select=c(DAMAGE_PROPERTY, DAMAGE_CROPS))
-head(newdata, n=10)
+# Creat Simple Plot
+plot(thunderstorms$YEAR, thunderstorms$number, type="p", main="Thunderstorms", xlab="Year", ylab="Number of Events")
 
 ```
 
+### Hail Storm Events
+
+```{r}
+# Subset the stormdata data frame
+hailstorms <- stormdata[stormdata$EVENT_TYPE=="Hail",c('YEAR', 'EVENT_TYPE', 'INJURIES_DIRECT', 'INJURIES_INDIRECT', 'DEATHS_DIRECT', 'DEATHS_INDIRECT', 'DAMAGE_PROPERTY', 'DAMAGE_CROPS', 'MAGNITUDE', 'MAGNITUDE_TYPE')] %>% group_by(YEAR) %>% summarise(number = n())
+
+# Creat Simple Plot
+plot(hailstorms$YEAR, hailstorms$number, type="p", main="Hail Storms", xlab="Year", ylab="Number of Events")
+
+```
+
+### Tornado Events
+
+```{r}
+# Subset the stormdata data frame
+tornados <- stormdata[stormdata$EVENT_TYPE=="Tornado",c('YEAR', 'EVENT_TYPE', 'INJURIES_DIRECT', 'INJURIES_INDIRECT', 'DEATHS_DIRECT', 'DEATHS_INDIRECT', 'DAMAGE_PROPERTY', 'DAMAGE_CROPS', 'MAGNITUDE', 'MAGNITUDE_TYPE')] %>% group_by(YEAR) %>% summarise(number = n())
+
+# Creat Simple Plot
+plot(tornados$YEAR, tornados$number, type="p", main="Tornados", xlab="Year", ylab="Number of Events")
+
+```
+
+### Winter Storm Events
+
+```{r}
+# Subset the stormdata data frame
+winterstorms <- stormdata[stormdata$EVENT_TYPE=="Winter Storm",c('YEAR', 'EVENT_TYPE', 'INJURIES_DIRECT', 'INJURIES_INDIRECT', 'DEATHS_DIRECT', 'DEATHS_INDIRECT', 'DAMAGE_PROPERTY', 'DAMAGE_CROPS', 'MAGNITUDE', 'MAGNITUDE_TYPE')] %>% group_by(YEAR) %>% summarise(number = n())
+
+# Creat Simple Plot
+plot(winterstorms$YEAR, winterstorms$number, type="p", main="Winter Storms", xlab="Year", ylab="Number of Events")
+
+```
+
+### Snow Storm Events
+
+```{r}
+# Subset the stormdata data frame
+snowstorms <- stormdata[stormdata$EVENT_TYPE=="Heavy Snow",c('YEAR', 'EVENT_TYPE', 'INJURIES_DIRECT', 'INJURIES_INDIRECT', 'DEATHS_DIRECT', 'DEATHS_INDIRECT', 'DAMAGE_PROPERTY', 'DAMAGE_CROPS', 'MAGNITUDE', 'MAGNITUDE_TYPE')] %>% group_by(YEAR) %>% summarise(number = n())
+
+# Creat Simple Plot
+plot(snowstorms$YEAR, snowstorms$number, type="p", main="Snow Storms", xlab="Year", ylab="Number of Events")
+
+```
+
+## Conclusions
+
+This data analysis project has certainly exposed me to many tools and resources which are available in order to complete a data mining project using important historical data sets.  We have gathered a total of 65 years of weather data for this exercise from the United States government via Data.gov and we have explored the content of this data with the aid of R Studio.  We set out to see if we could create a visualization of this data that demonstrates claims that global warming could be contributing to an increased occurrence of weather events here within the United States.  The historical data certainly shows a significant increase in the occurrence of all weather events (with the only exception where there is limited historical data).  In fact, the records show that the increased frequency of storms is shockingly increasing at what appears to be logarithmic rates.  What we don't know from this data is whether or not the sharp upward trend is a reflection of our increased ability to monitor and to gather this data or if there is a real upward rate in actual occurrence of these weather events.
+
+This exercise was not intended to break any ground by creating any new awareness of what has been studied many times before this one.  The main purpose of my personal study was to gather an increased awareness of how to gather and how to complete a data mining study with some rather interesting data.
 

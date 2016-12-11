@@ -4,13 +4,26 @@ October 17, 2016
 
 # NCDC Storm Events Database Analysis
 
-## Get and Clean Data from DATA.gov
+## Get Data from DATA.gov
 
 I am an MBA student at Bridgewater State University, enrolled in MGMT582 - Business Intelligence/Analytics.  This data exploration project is intended to be my final project and in-class presentation.  The goal of this project is to gain practical working experience with R Studio and to apply some data analysis techniques in which we have been introduced within this course.
 
 I have chosen to work with the NCDC Storm Events Database available at DATA.gov.  For more details related to this raw data set, see <https://catalog.data.gov/dataset/ncdc-storm-events-database>.
 
-My first step in preparing my analysis will be to write a script to get the data at Data.gov.  After following instructions about the storm events database, I found that the raw data sits in zipped files located on an FTP server at <ftp://ftp.ncdc.noaa.gov/pub/data/swdi/stormevents/csvfiles/>.  I am going to attempt to write a script that will automatically get this data from its FTP location, unzip each file, and then append it to create a larger file that can be analyzed here with R Studio.
+My first step in preparing my analysis will be to write a script to get the data at Data.gov.  After following instructions about the storm events database, I found that the raw data sits in zipped files located on an FTP server at <ftp://ftp.ncdc.noaa.gov/pub/data/swdi/stormevents/csvfiles/>.  I have prepared a script that will automatically get this data from its FTP location, unzip each file, and then append it to create a larger file that can be analyzed here with R Studio.  The development of this script was an iterative process, as I needed to be cautious of memory requirements.  
+
+With my first pass at the collection of data from Data.gov, I collected 10 years of data back to 2006.  I found that my personal computer could handle this task and the stormdata.csv file was approximately 200MB in size.  Since my computer has nearly 8GB of RAM, I decided to go ahead and collect a full 65 years of storm data.  After pulling 65 years of data, I observed that my final stormdata.csv file was only 400MB in size.  This appears to be a very manageable data set that can be conveniently explored here with R Studio.
+
+Now, the process of collecting this data via FTP, downloading, unzipping, and then concatenating each of the individual files is quite timely and it is not necessary to do all of this work with each and every execution of the Knitr markdown script.  To aid in the data exploration process, I will introduce caching into R Studio with the script as follows:
+
+
+
+```r
+knitr::opts_chunk$set(cache=TRUE)
+```
+
+Let's now iterate through 65 years of storm data, collect this data via download from the public FTP site, concatenate the data into a larger data set, and store a copy of this file locally on our computer.
+
 
 
 ```r
@@ -20,12 +33,10 @@ if (!file.exists("./stormdata.csv")) {
     
     i <- 1
 
-    for (year in 2006:2016) {
+    for (year in 1951:2016) {
         # Determine file name extension
-        if (year==2014) {
-            extstr <- "_c20160617.csv.gz"
-        } else if (year==2015 || year==2016) {
-            extstr <- "_c20160921.csv.gz"
+        if (year==2006 || year==2014 || year==2015 || year==2016) {
+            extstr <- "_c20161118.csv.gz"
         } else {
             extstr <- "_c20160223.csv.gz"
         }
@@ -71,7 +82,7 @@ if (!file.exists("./stormdata.csv")) {
 ```
 ## Initial Table Exploration and Observation
 
-The script above has successfully assembled 10+ years of data from the NCDC Storm Events Database from calendar year 2006 through summer of 2016.  We have eliminated the long text fields related to the description of the storm events.  We did this in order to produce a table size which is manageable on our desktop computers.  Elimination of these text fields dropped the file size to nearly 25% of its original size.  Our final CSV file is appx 193MB in size and it contains 656K observations of 50 variables.
+The script above has successfully assembled 65 years of data from the NCDC Storm Events Database from calendar year 1951 through summer of 2016.  We have eliminated the long text fields related to the description of the storm events.  We did this in order to produce a table size which is manageable on our desktop computers.  Elimination of these text fields dropped the file size to nearly 25% of its original size.  Our final CSV file is appx 400MB in size and it contains 1,401,817 observations of 50 variables.
 
 It is now desirable to conduct some exploration techniques as outlined on RDatamining.com.  We will follow the examples put forth on the following page in order to begin our exploration of this significant data file.
 
@@ -88,7 +99,7 @@ dim(stormdata)
 ```
 
 ```
-## [1] 655983     50
+## [1] 1401817      50
 ```
 
 ```r
@@ -122,57 +133,57 @@ str(stormdata)
 ```
 
 ```
-## 'data.frame':	655983 obs. of  50 variables:
+## 'data.frame':	1401817 obs. of  50 variables:
 ##  $ X                 : int  1 2 3 4 5 6 7 8 9 10 ...
-##  $ BEGIN_YEARMONTH   : int  200604 200601 200601 200601 200601 200601 200601 200601 200601 200601 ...
-##  $ BEGIN_DAY         : int  7 1 1 1 1 10 30 30 28 28 ...
-##  $ BEGIN_TIME        : int  1515 0 0 0 0 1100 500 500 800 1400 ...
-##  $ END_YEARMONTH     : int  200604 200601 200601 200601 200601 200601 200601 200601 200601 200601 ...
-##  $ END_DAY           : int  7 31 31 31 31 10 31 31 29 29 ...
-##  $ END_TIME          : int  1515 2359 2359 2359 2359 1100 1400 1400 1300 500 ...
-##  $ EPISODE_ID        : int  1207534 1202408 1202408 1202408 1202408 1202432 1202394 1202394 1202395 1202396 ...
-##  $ EVENT_ID          : int  5501658 5482463 5482464 5482465 5482466 5482724 5482324 5482325 5482326 5482327 ...
-##  $ STATE             : Factor w/ 68 levels "ALABAMA","ALASKA",..: 23 9 9 9 9 25 9 9 9 9 ...
-##  $ STATE_FIPS        : int  18 8 8 8 8 20 8 8 8 8 ...
-##  $ YEAR              : int  2006 2006 2006 2006 2006 2006 2006 2006 2006 2006 ...
-##  $ MONTH_NAME        : Factor w/ 12 levels "April","August",..: 1 5 5 5 5 5 5 5 5 5 ...
-##  $ EVENT_TYPE        : Factor w/ 56 levels "Astronomical Low Tide",..: 46 9 9 9 9 22 56 56 55 56 ...
-##  $ CZ_TYPE           : Factor w/ 3 levels "C","M","Z": 1 3 3 3 3 3 3 3 3 3 ...
-##  $ CZ_FIPS           : int  51 2 7 4 13 92 4 13 13 5 ...
-##  $ CZ_NAME           : Factor w/ 4311 levels "5NM E OF FAIRPORT MI TO ROCK ISLAND PASSAGE",..: 1392 577 977 1235 1312 3677 1235 1312 1312 3885 ...
-##  $ WFO               : Factor w/ 125 levels "ABQ","ABR","AFC",..: 97 46 46 46 46 58 46 46 46 46 ...
-##  $ BEGIN_DATE_TIME   : Factor w/ 332526 levels "01-APR-06 00:00:00",..: 63753 2931 2931 2931 2931 100656 318116 318116 298587 298596 ...
-##  $ CZ_TIMEZONE       : Factor w/ 16 levels "AKST-9","AST",..: 4 11 11 11 11 4 11 11 11 11 ...
-##  $ END_DATE_TIME     : Factor w/ 326849 levels "01-APR-06 00:50:00",..: 62437 321468 321468 321468 321468 98418 321457 321457 302862 302859 ...
-##  $ INJURIES_DIRECT   : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ BEGIN_YEARMONTH   : int  195109 195106 195103 195105 195107 195105 195103 195105 195106 195107 ...
+##  $ BEGIN_DAY         : int  9 17 28 9 15 8 30 11 27 21 ...
+##  $ BEGIN_TIME        : int  915 2200 510 1830 1620 1800 1500 1330 2204 1100 ...
+##  $ END_YEARMONTH     : int  195109 195106 195103 195105 195107 195105 195103 195105 195106 195107 ...
+##  $ END_DAY           : int  9 17 28 9 15 8 30 11 27 21 ...
+##  $ END_TIME          : int  915 2200 510 1830 1620 1800 1500 1330 2204 1100 ...
+##  $ EPISODE_ID        : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ EVENT_ID          : int  10047282 10028729 10120421 10099717 10099742 10028691 10104933 10104934 10104935 10104936 ...
+##  $ STATE             : Factor w/ 69 levels "","ALABAMA","ALASKA",..: 40 26 61 52 52 26 54 54 54 54 ...
+##  $ STATE_FIPS        : int  28 20 48 40 40 20 42 42 42 42 ...
+##  $ YEAR              : int  1951 1951 1951 1951 1951 1951 1951 1951 1951 1951 ...
+##  $ MONTH_NAME        : Factor w/ 12 levels "April","August",..: 12 7 8 9 6 9 8 9 7 6 ...
+##  $ EVENT_TYPE        : Factor w/ 74 levels "Astronomical Low Tide",..: 63 63 63 63 63 63 63 63 63 63 ...
+##  $ CZ_TYPE           : Factor w/ 3 levels "C","M","Z": 1 1 1 1 1 1 1 1 1 1 ...
+##  $ CZ_FIPS           : int  87 63 225 33 73 203 1 111 5 15 ...
+##  $ CZ_NAME           : Factor w/ 5135 levels "","5NM E OF FAIRPORT MI TO ROCK ISLAND PASSAGE",..: 2507 1673 1939 1011 2195 4978 17 4003 116 356 ...
+##  $ WFO               : Factor w/ 542 levels "","$AC","$AG",..: NA NA NA NA NA NA NA NA NA NA ...
+##  $ BEGIN_DATE_TIME   : Factor w/ 754787 levels "01-APR-00 00:00:00",..: 223320 409904 687802 219403 357636 193110 733184 271822 660342 505338 ...
+##  $ CZ_TIMEZONE       : Factor w/ 26 levels "AKST-9","AST",..: 7 7 7 7 7 7 7 7 7 7 ...
+##  $ END_DATE_TIME     : Factor w/ 746369 levels "01-APR-00 00:05:00",..: 219760 404183 679406 215886 352362 190068 724347 267679 652124 498484 ...
+##  $ INJURIES_DIRECT   : int  0 0 0 0 0 0 0 1 0 0 ...
 ##  $ INJURIES_INDIRECT : int  0 0 0 0 0 0 0 0 0 0 ...
 ##  $ DEATHS_DIRECT     : int  0 0 0 0 0 0 0 0 0 0 ...
 ##  $ DEATHS_INDIRECT   : int  0 0 0 0 0 0 0 0 0 0 ...
-##  $ DAMAGE_PROPERTY   : Factor w/ 1639 levels "",".01K",".01M",..: 1313 1 1 1 1 30 1 1 1 1 ...
-##  $ DAMAGE_CROPS      : Factor w/ 576 levels "",".1K",".2K",..: 1 1 1 1 1 6 1 1 1 1 ...
-##  $ SOURCE            : Factor w/ 71 levels "911 Call Center",..: 28 29 29 29 29 65 8 8 8 65 ...
-##  $ MAGNITUDE         : num  61 NA NA NA NA NA NA NA NA NA ...
-##  $ MAGNITUDE_TYPE    : Factor w/ 5 levels "","EG","ES","MG",..: 2 1 1 1 1 1 1 1 1 1 ...
-##  $ FLOOD_CAUSE       : Factor w/ 8 levels "","Dam / Levee Break",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ DAMAGE_PROPERTY   : Factor w/ 2618 levels "",".01K",".01M",..: 206 206 924 924 47 47 924 1168 924 47 ...
+##  $ DAMAGE_CROPS      : Factor w/ 1108 levels "",".01K",".01M",..: 59 59 59 59 59 59 59 59 59 59 ...
+##  $ SOURCE            : Factor w/ 73 levels "","911 Call Center",..: NA NA NA NA NA NA NA NA NA NA ...
+##  $ MAGNITUDE         : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ MAGNITUDE_TYPE    : Factor w/ 7 levels "","E","EG","ES",..: NA NA NA NA NA NA NA NA NA NA ...
+##  $ FLOOD_CAUSE       : Factor w/ 8 levels "","Dam / Levee Break",..: NA NA NA NA NA NA NA NA NA NA ...
 ##  $ CATEGORY          : int  NA NA NA NA NA NA NA NA NA NA ...
-##  $ TOR_F_SCALE       : Factor w/ 13 levels "","EF0","EF1",..: 1 1 1 1 1 1 1 1 1 1 ...
-##  $ TOR_LENGTH        : num  NA NA NA NA NA NA NA NA NA NA ...
-##  $ TOR_WIDTH         : num  NA NA NA NA NA NA NA NA NA NA ...
-##  $ TOR_OTHER_WFO     : Factor w/ 89 levels "","ABQ","ABR",..: 1 1 1 1 1 1 1 1 1 1 ...
-##  $ TOR_OTHER_CZ_STATE: Factor w/ 39 levels "","AL","AR","CA",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ TOR_F_SCALE       : Factor w/ 14 levels "","EF0","EF1",..: 11 9 10 10 11 10 10 11 11 9 ...
+##  $ TOR_LENGTH        : num  0.1 0.7 0.5 0 0 0 0.1 8 19.7 0.1 ...
+##  $ TOR_WIDTH         : num  100 33 17 33 100 33 20 33 33 33 ...
+##  $ TOR_OTHER_WFO     : Factor w/ 90 levels "","ABQ","ABR",..: NA NA NA NA NA NA NA NA NA NA ...
+##  $ TOR_OTHER_CZ_STATE: Factor w/ 40 levels "","AL","AR","CA",..: NA NA NA NA NA NA NA NA NA NA ...
 ##  $ TOR_OTHER_CZ_FIPS : int  NA NA NA NA NA NA NA NA NA NA ...
-##  $ TOR_OTHER_CZ_NAME : Factor w/ 693 levels "","ADAIR","ADAMS",..: 1 1 1 1 1 1 1 1 1 1 ...
-##  $ BEGIN_RANGE       : int  4 NA NA NA NA NA NA NA NA NA ...
-##  $ BEGIN_AZIMUTH     : Factor w/ 18 levels "","E","ENE","ESE",..: 2 1 1 1 1 1 1 1 1 1 ...
-##  $ BEGIN_LOCATION    : Factor w/ 40699 levels "","(01R)AFB GNRY RNG AL",..: 28186 1 1 1 1 1 1 1 1 1 ...
-##  $ END_RANGE         : int  NA NA NA NA NA NA NA NA NA NA ...
-##  $ END_AZIMUTH       : Factor w/ 18 levels "","E","ENE","ESE",..: 1 1 1 1 1 1 1 1 1 1 ...
-##  $ END_LOCATION      : Factor w/ 41144 levels "","(01R)AFB GNRY RNG AL",..: 27166 1 1 1 1 1 1 1 1 1 ...
-##  $ BEGIN_LAT         : num  38.4 NA NA NA NA ...
-##  $ BEGIN_LON         : num  -87.5 NA NA NA NA ...
-##  $ END_LAT           : num  38.3 NA NA NA NA ...
-##  $ END_LON           : num  -87.3 NA NA NA NA ...
-##  $ DATA_SOURCE       : Factor w/ 2 levels "CSV","PDS": 2 2 2 2 2 2 2 2 2 2 ...
+##  $ TOR_OTHER_CZ_NAME : Factor w/ 697 levels "","ADAIR","ADAMS",..: NA NA NA NA NA NA NA NA NA NA ...
+##  $ BEGIN_RANGE       : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ BEGIN_AZIMUTH     : Factor w/ 31 levels "","E","Eas","EE",..: NA NA NA NA NA NA NA NA NA NA ...
+##  $ BEGIN_LOCATION    : Factor w/ 58057 levels "","- 1 N Albion",..: NA NA NA NA NA NA NA NA NA NA ...
+##  $ END_RANGE         : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ END_AZIMUTH       : Factor w/ 24 levels "","E","ENE","ENESE",..: NA NA NA NA NA NA NA NA NA NA ...
+##  $ END_LOCATION      : Factor w/ 47039 levels "","- .5 NNW",..: NA NA NA NA NA NA NA NA NA NA ...
+##  $ BEGIN_LAT         : num  33.5 39.1 31.4 34.5 34.8 ...
+##  $ BEGIN_LON         : num  -88.4 -100.2 -95.6 -98.3 -94.8 ...
+##  $ END_LAT           : num  NA NA NA NA NA ...
+##  $ END_LON           : num  NA NA NA NA NA ...
+##  $ DATA_SOURCE       : Factor w/ 4 levels "CSV","PDC","PDS",..: 4 4 4 4 4 4 4 4 4 4 ...
 ```
 
 ```r
@@ -182,65 +193,59 @@ head(stormdata, n=5)
 
 ```
 ##   X BEGIN_YEARMONTH BEGIN_DAY BEGIN_TIME END_YEARMONTH END_DAY END_TIME
-## 1 1          200604         7       1515        200604       7     1515
-## 2 2          200601         1          0        200601      31     2359
-## 3 3          200601         1          0        200601      31     2359
-## 4 4          200601         1          0        200601      31     2359
-## 5 5          200601         1          0        200601      31     2359
-##   EPISODE_ID EVENT_ID    STATE STATE_FIPS YEAR MONTH_NAME
-## 1    1207534  5501658  INDIANA         18 2006      April
-## 2    1202408  5482463 COLORADO          8 2006    January
-## 3    1202408  5482464 COLORADO          8 2006    January
-## 4    1202408  5482465 COLORADO          8 2006    January
-## 5    1202408  5482466 COLORADO          8 2006    January
-##          EVENT_TYPE CZ_TYPE CZ_FIPS                    CZ_NAME WFO
-## 1 Thunderstorm Wind       C      51                     GIBSON PAH
-## 2           Drought       Z       2  CENTRAL YAMPA RIVER BASIN GJT
-## 3           Drought       Z       7   DEBEQUE TO SILT CORRIDOR GJT
-## 4           Drought       Z       4 ELKHEAD AND PARK MOUNTAINS GJT
-## 5           Drought       Z      13          FLATTOP MOUNTAINS GJT
-##      BEGIN_DATE_TIME CZ_TIMEZONE      END_DATE_TIME INJURIES_DIRECT
-## 1 07-APR-06 15:15:00         CST 07-APR-06 15:15:00               0
-## 2 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
-## 3 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
-## 4 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
-## 5 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
-##   INJURIES_INDIRECT DEATHS_DIRECT DEATHS_INDIRECT DAMAGE_PROPERTY
-## 1                 0             0               0             60K
-## 2                 0             0               0                
-## 3                 0             0               0                
-## 4                 0             0               0                
-## 5                 0             0               0                
-##   DAMAGE_CROPS         SOURCE MAGNITUDE MAGNITUDE_TYPE FLOOD_CAUSE
-## 1              GENERAL PUBLIC        61             EG            
-## 2               GOVT OFFICIAL        NA                           
-## 3               GOVT OFFICIAL        NA                           
-## 4               GOVT OFFICIAL        NA                           
-## 5               GOVT OFFICIAL        NA                           
-##   CATEGORY TOR_F_SCALE TOR_LENGTH TOR_WIDTH TOR_OTHER_WFO
-## 1       NA                     NA        NA              
-## 2       NA                     NA        NA              
-## 3       NA                     NA        NA              
-## 4       NA                     NA        NA              
-## 5       NA                     NA        NA              
-##   TOR_OTHER_CZ_STATE TOR_OTHER_CZ_FIPS TOR_OTHER_CZ_NAME BEGIN_RANGE
-## 1                                   NA                             4
-## 2                                   NA                            NA
-## 3                                   NA                            NA
-## 4                                   NA                            NA
-## 5                                   NA                            NA
-##   BEGIN_AZIMUTH BEGIN_LOCATION END_RANGE END_AZIMUTH END_LOCATION
-## 1             E         PATOKA        NA             OAKLAND CITY
-## 2                                     NA                         
-## 3                                     NA                         
-## 4                                     NA                         
-## 5                                     NA                         
-##   BEGIN_LAT BEGIN_LON END_LAT END_LON DATA_SOURCE
-## 1     38.42    -87.52   38.33  -87.35         PDS
-## 2        NA        NA      NA      NA         PDS
-## 3        NA        NA      NA      NA         PDS
-## 4        NA        NA      NA      NA         PDS
-## 5        NA        NA      NA      NA         PDS
+## 1 1          195109         9        915        195109       9      915
+## 2 2          195106        17       2200        195106      17     2200
+## 3 3          195103        28        510        195103      28      510
+## 4 4          195105         9       1830        195105       9     1830
+## 5 5          195107        15       1620        195107      15     1620
+##   EPISODE_ID EVENT_ID       STATE STATE_FIPS YEAR MONTH_NAME EVENT_TYPE
+## 1         NA 10047282 MISSISSIPPI         28 1951  September    Tornado
+## 2         NA 10028729      KANSAS         20 1951       June    Tornado
+## 3         NA 10120421       TEXAS         48 1951      March    Tornado
+## 4         NA 10099717    OKLAHOMA         40 1951        May    Tornado
+## 5         NA 10099742    OKLAHOMA         40 1951       July    Tornado
+##   CZ_TYPE CZ_FIPS    CZ_NAME  WFO    BEGIN_DATE_TIME CZ_TIMEZONE
+## 1       C      87    LOWNDES <NA> 09-SEP-51 09:15:00         CST
+## 2       C      63       GOVE <NA> 17-JUN-51 22:00:00         CST
+## 3       C     225    HOUSTON <NA> 28-MAR-51 05:10:00         CST
+## 4       C      33     COTTON <NA> 09-MAY-51 18:30:00         CST
+## 5       C      73 KINGFISHER <NA> 15-JUL-51 16:20:00         CST
+##        END_DATE_TIME INJURIES_DIRECT INJURIES_INDIRECT DEATHS_DIRECT
+## 1 09-SEP-51 09:15:00               0                 0             0
+## 2 17-JUN-51 22:00:00               0                 0             0
+## 3 28-MAR-51 05:10:00               0                 0             0
+## 4 09-MAY-51 18:30:00               0                 0             0
+## 5 15-JUL-51 16:20:00               0                 0             0
+##   DEATHS_INDIRECT DAMAGE_PROPERTY DAMAGE_CROPS SOURCE MAGNITUDE
+## 1               0              0K            0   <NA>         0
+## 2               0              0K            0   <NA>         0
+## 3               0            2.5K            0   <NA>         0
+## 4               0            2.5K            0   <NA>         0
+## 5               0            .25K            0   <NA>         0
+##   MAGNITUDE_TYPE FLOOD_CAUSE CATEGORY TOR_F_SCALE TOR_LENGTH TOR_WIDTH
+## 1           <NA>        <NA>       NA          F2        0.1       100
+## 2           <NA>        <NA>       NA          F0        0.7        33
+## 3           <NA>        <NA>       NA          F1        0.5        17
+## 4           <NA>        <NA>       NA          F1        0.0        33
+## 5           <NA>        <NA>       NA          F2        0.0       100
+##   TOR_OTHER_WFO TOR_OTHER_CZ_STATE TOR_OTHER_CZ_FIPS TOR_OTHER_CZ_NAME
+## 1          <NA>               <NA>                NA              <NA>
+## 2          <NA>               <NA>                NA              <NA>
+## 3          <NA>               <NA>                NA              <NA>
+## 4          <NA>               <NA>                NA              <NA>
+## 5          <NA>               <NA>                NA              <NA>
+##   BEGIN_RANGE BEGIN_AZIMUTH BEGIN_LOCATION END_RANGE END_AZIMUTH
+## 1           0          <NA>           <NA>         0        <NA>
+## 2           0          <NA>           <NA>         0        <NA>
+## 3           0          <NA>           <NA>         0        <NA>
+## 4           0          <NA>           <NA>         0        <NA>
+## 5           0          <NA>           <NA>         0        <NA>
+##   END_LOCATION BEGIN_LAT BEGIN_LON END_LAT END_LON DATA_SOURCE
+## 1         <NA>     33.50    -88.43      NA      NA         PUB
+## 2         <NA>     39.07   -100.23      NA      NA         PUB
+## 3         <NA>     31.37    -95.60      NA      NA         PUB
+## 4         <NA>     34.45    -98.32      NA      NA         PUB
+## 5         <NA>     34.80    -94.80      NA      NA         PUB
 ```
 
 ```r
@@ -249,157 +254,153 @@ summary(stormdata)
 ```
 
 ```
-##        X          BEGIN_YEARMONTH    BEGIN_DAY       BEGIN_TIME  
-##  Min.   :     1   Min.   :200601   Min.   : 1.00   Min.   :   0  
-##  1st Qu.:163997   1st Qu.:200807   1st Qu.: 7.00   1st Qu.: 751  
-##  Median :327992   Median :201104   Median :15.00   Median :1455  
-##  Mean   :327992   Mean   :201079   Mean   :14.88   Mean   :1277  
-##  3rd Qu.:491988   3rd Qu.:201307   3rd Qu.:23.00   3rd Qu.:1802  
-##  Max.   :655983   Max.   :201606   Max.   :31.00   Max.   :2359  
-##                                                                  
-##  END_YEARMONTH       END_DAY         END_TIME      EPISODE_ID     
-##  Min.   :200601   Min.   : 1.00   Min.   :   0   Min.   :      1  
-##  1st Qu.:200807   1st Qu.: 9.00   1st Qu.:1120   1st Qu.:  29386  
-##  Median :201104   Median :17.00   Median :1601   Median :  57577  
-##  Mean   :201079   Mean   :16.69   Mean   :1476   Mean   : 139416  
-##  3rd Qu.:201307   3rd Qu.:25.00   3rd Qu.:1905   3rd Qu.:  85879  
-##  Max.   :201606   Max.   :31.00   Max.   :2359   Max.   :1221738  
+##        X           BEGIN_YEARMONTH    BEGIN_DAY       BEGIN_TIME  
+##  Min.   :      1   Min.   :195101   Min.   : 1.00   Min.   :   0  
+##  1st Qu.: 350455   1st Qu.:199806   1st Qu.: 7.00   1st Qu.: 900  
+##  Median : 700909   Median :200506   Median :15.00   Median :1520  
+##  Mean   : 700909   Mean   :200258   Mean   :15.01   Mean   :1331  
+##  3rd Qu.:1051363   3rd Qu.:201103   3rd Qu.:23.00   3rd Qu.:1824  
+##  Max.   :1401817   Max.   :201608   Max.   :31.00   Max.   :2359  
 ##                                                                   
-##     EVENT_ID            STATE          STATE_FIPS         YEAR     
-##  Min.   :      3   TEXAS   : 48550   Min.   : 1.00   Min.   :2006  
-##  1st Qu.: 173642   KANSAS  : 29866   1st Qu.:19.00   1st Qu.:2008  
-##  Median : 346517   MISSOURI: 24607   Median :30.00   Median :2011  
-##  Mean   : 705409   IOWA    : 23717   Mean   :32.09   Mean   :2011  
-##  3rd Qu.: 520514   ILLINOIS: 22982   3rd Qu.:46.00   3rd Qu.:2013  
-##  Max.   :5535308   KENTUCKY: 22481   Max.   :99.00   Max.   :2016  
-##                    (Other) :483780                                 
-##     MONTH_NAME                 EVENT_TYPE     CZ_TYPE       CZ_FIPS      
-##  June    :104159   Thunderstorm Wind:160389   C:395927   Min.   :  1.00  
-##  July    : 78997   Hail             :137466   M:  1278   1st Qu.: 25.00  
-##  May     : 74873   Flash Flood      : 38477   Z:258778   Median : 63.00  
-##  April   : 65847   Winter Weather   : 37904              Mean   : 95.84  
-##  August  : 56960   Drought          : 34288              3rd Qu.:116.00  
-##  February: 55282   Winter Storm     : 33687              Max.   :876.00  
-##  (Other) :219865   (Other)          :213772                              
-##        CZ_NAME            WFO                   BEGIN_DATE_TIME  
-##  WASHINGTON:  5219   LWX    : 19684   01-JUL-12 00:00:00:  1163  
-##  JEFFERSON :  5172   PAH    : 18182   01-AUG-12 00:00:00:  1129  
-##  FRANKLIN  :  4616   PHI    : 17720   01-SEP-12 00:00:00:   998  
-##  JACKSON   :  4425   OUN    : 13669   01-OCT-12 00:00:00:   883  
-##  MONTGOMERY:  4122   DMX    : 12044   01-NOV-12 00:00:00:   809  
-##  MADISON   :  4109   LZK    : 10931   01-DEC-12 00:00:00:   789  
-##  (Other)   :628320   (Other):563753   (Other)           :650212  
-##   CZ_TIMEZONE                END_DATE_TIME    INJURIES_DIRECT   
-##  CST-6  :293675   31-JUL-12 23:59:00:  1107   Min.   :0.00e+00  
-##  EST-5  :215194   31-AUG-12 23:59:00:  1009   1st Qu.:0.00e+00  
-##  MST-7  : 66917   30-JUN-12 23:59:00:   929   Median :0.00e+00  
-##  CST    : 24820   30-SEP-12 23:59:00:   889   Mean   :5.12e-02  
-##  PST-8  : 20386   30-NOV-12 23:59:00:   778   3rd Qu.:0.00e+00  
-##  EST    : 17018   31-DEC-12 23:59:00:   772   Max.   :1.15e+03  
-##  (Other): 17973   (Other)           :650499                     
-##  INJURIES_INDIRECT  DEATHS_DIRECT      DEATHS_INDIRECT    
-##  Min.   :0.00e+00   Min.   :0.00e+00   Min.   : 0.000000  
-##  1st Qu.:0.00e+00   1st Qu.:0.00e+00   1st Qu.: 0.000000  
-##  Median :0.00e+00   Median :0.00e+00   Median : 0.000000  
-##  Mean   :1.77e-02   Mean   :8.82e-03   Mean   : 0.002831  
-##  3rd Qu.:0.00e+00   3rd Qu.:0.00e+00   3rd Qu.: 0.000000  
-##  Max.   :2.40e+03   Max.   :1.58e+02   Max.   :11.000000  
+##  END_YEARMONTH       END_DAY         END_TIME      EPISODE_ID     
+##  Min.   :195101   Min.   : 1.00   Min.   :   0   Min.   :      1  
+##  1st Qu.:199806   1st Qu.: 8.00   1st Qu.:1200   1st Qu.:  51531  
+##  Median :200506   Median :16.00   Median :1615   Median : 103331  
+##  Mean   :200258   Mean   :16.34   Mean   :1490   Mean   : 709598  
+##  3rd Qu.:201103   3rd Qu.:24.00   3rd Qu.:1910   3rd Qu.:1177854  
+##  Max.   :201608   Max.   :31.00   Max.   :2359   Max.   :2414827  
+##                                                  NA's   :232016   
+##     EVENT_ID             STATE           STATE_FIPS         YEAR     
+##  Min.   :       3   TEXAS   : 117456   Min.   : 1.00   Min.   :1951  
+##  1st Qu.:  370393   KANSAS  :  71157   1st Qu.:19.00   1st Qu.:1998  
+##  Median : 5254290   OKLAHOMA:  60550   Median :30.00   Median :2005  
+##  Mean   : 3948304   MISSOURI:  52747   Mean   :31.56   Mean   :2003  
+##  3rd Qu.: 5605881   IOWA    :  50453   3rd Qu.:45.00   3rd Qu.:2011  
+##  Max.   :10358522   NEBRASKA:  45590   Max.   :99.00   Max.   :2016  
+##                     (Other) :1003864   NA's   :1                     
+##    MONTH_NAME                 EVENT_TYPE     CZ_TYPE       CZ_FIPS      
+##  June   :220903   Thunderstorm Wind:397658   C:947024   Min.   :  0.00  
+##  July   :188175   Hail             :339848   M:  7513   1st Qu.: 25.00  
+##  May    :186714   Flash Flood      : 72281   Z:447280   Median : 65.00  
+##  April  :140301   Tornado          : 65851              Mean   : 92.84  
+##  August :128854   Winter Storm     : 64208              3rd Qu.:117.00  
+##  March  : 99832   High Wind        : 58732              Max.   :876.00  
+##  (Other):437038   (Other)          :403239                              
+##        CZ_NAME             WFO                    BEGIN_DATE_TIME   
+##  WASHINGTON:  11902   PHI    :  33131   01-JUL-12 00:00:00:   1163  
+##  JEFFERSON :  11877   LWX    :  30961   01-AUG-12 00:00:00:   1129  
+##  JACKSON   :  10324   PAH    :  28519   01-SEP-12 00:00:00:    998  
+##  FRANKLIN  :   9666   OUN    :  27764   01-OCT-12 00:00:00:    883  
+##  MADISON   :   8979   DMX    :  22484   01-NOV-12 00:00:00:    809  
+##  MONTGOMERY:   8937   (Other):1150768   01-DEC-12 00:00:00:    789  
+##  (Other)   :1340132   NA's   : 108190   (Other)           :1396046  
+##   CZ_TIMEZONE                END_DATE_TIME     INJURIES_DIRECT    
+##  CST    :472216   31-JUL-12 23:59:00:   1107   Min.   :   0.0000  
+##  CST-6  :300416   31-AUG-12 23:59:00:   1009   1st Qu.:   0.0000  
+##  EST-5  :221013   30-JUN-12 23:59:00:    929   Median :   0.0000  
+##  EST    :215488   30-SEP-12 23:59:00:    889   Mean   :   0.1054  
+##  MST-7  : 68724   30-NOV-12 23:59:00:    778   3rd Qu.:   0.0000  
+##  MST    : 54611   31-DEC-12 23:59:00:    772   Max.   :1700.0000  
+##  (Other): 69349   (Other)           :1396333                      
+##  INJURIES_INDIRECT DEATHS_DIRECT       DEATHS_INDIRECT    
+##  Min.   :0.0e+00   Min.   :  0.00000   Min.   : 0.000000  
+##  1st Qu.:0.0e+00   1st Qu.:  0.00000   1st Qu.: 0.000000  
+##  Median :0.0e+00   Median :  0.00000   Median : 0.000000  
+##  Mean   :8.3e-03   Mean   :  0.01126   Mean   : 0.001357  
+##  3rd Qu.:0.0e+00   3rd Qu.:  0.00000   3rd Qu.: 0.000000  
+##  Max.   :2.4e+03   Max.   :158.00000   Max.   :13.000000  
 ##                                                           
-##  DAMAGE_PROPERTY   DAMAGE_CROPS                  SOURCE      
-##  0.00K  :366824   0.00K  :499341   Trained Spotter  :118783  
-##         :125526          :138881   Public           : 65855  
-##  5.00K  : 19438   0      :  2839   Law Enforcement  : 64478  
-##  1.00K  : 18674   10.00K :  1514   Emergency Manager: 56539  
-##  10.00K : 16087   5.00K  :  1508   Mesonet          : 32394  
-##  2.00K  : 13147   1.00K  :   902   COOP Observer    : 28510  
-##  (Other): 96287   (Other): 10998   (Other)          :289424  
-##    MAGNITUDE      MAGNITUDE_TYPE                       FLOOD_CAUSE    
-##  Min.   :  0.00     :438097                                  :598099  
-##  1st Qu.:  1.00   EG:162475      Heavy Rain                  : 52352  
-##  Median : 50.00   ES:  1577      Heavy Rain / Snow Melt      :  2964  
-##  Mean   : 32.37   MG: 49490      Heavy Rain / Tropical System:  1463  
-##  3rd Qu.: 52.00   MS:  4344      Ice Jam                     :   454  
-##  Max.   :362.00                  Heavy Rain / Burn Area      :   442  
-##  NA's   :300178                  (Other)                     :   209  
-##     CATEGORY       TOR_F_SCALE       TOR_LENGTH       TOR_WIDTH     
-##  Min.   :1.0             :641538   Min.   :  0.0    Min.   :   0    
-##  1st Qu.:1.0      EF0    :  7053   1st Qu.:  0.4    1st Qu.:  40    
-##  Median :1.0      EF1    :  4261   Median :  1.5    Median :  75    
-##  Mean   :1.2      EF2    :  1300   Mean   :  3.2    Mean   : 173    
-##  3rd Qu.:1.0      F0     :   766   3rd Qu.:  4.0    3rd Qu.: 200    
-##  Max.   :5.0      EF3    :   406   Max.   :400.0    Max.   :4576    
-##  NA's   :655793   (Other):   659   NA's   :641538   NA's   :641538  
+##  DAMAGE_PROPERTY   DAMAGE_CROPS                SOURCE      
+##         :482876          :595165   Trained Spotter:120833  
+##  0.00K  :374040   0.00K  :510225                  :113626  
+##  0      :200035   0      :256102   TRAINED SPOTTER: 87990  
+##  5K     : 23324   0K     :  8947   LAW ENFORCEMENT: 85397  
+##  5.00K  : 20060   5K     :  3084   Public         : 67657  
+##  1.00K  : 19205   10K    :  1555   (Other)        :694298  
+##  (Other):282277   (Other): 26739   NA's           :232016  
+##    MAGNITUDE       MAGNITUDE_TYPE                         FLOOD_CAUSE    
+##  Min.   :    0.0          :862684                               :611299  
+##  1st Qu.:    0.8   EG     :206909   Heavy Rain                  : 53881  
+##  Median :    1.8   MG     : 59652   Heavy Rain / Snow Melt      :  2968  
+##  Mean   :   24.3   E      : 23246   Heavy Rain / Tropical System:  1467  
+##  3rd Qu.:   52.0   M      :  8302   Heavy Rain / Burn Area      :   455  
+##  Max.   :22000.0   (Other):  9008   (Other)                     :   664  
+##  NA's   :568658    NA's   :232016   NA's                        :731083  
+##     CATEGORY        TOR_F_SCALE        TOR_LENGTH        TOR_WIDTH      
+##  Min.   :1.0              :1337925   Min.   :   0.0    Min.   :   0.0   
+##  1st Qu.:1.0       F0     :  20760   1st Qu.:   0.0    1st Qu.:   0.0   
+##  Median :1.0       F1     :  16839   Median :   0.0    Median :   0.0   
+##  Mean   :1.2       F2     :   8944   Mean   :   0.8    Mean   :  29.3   
+##  3rd Qu.:1.0       EF0    :   7183   3rd Qu.:   0.0    3rd Qu.:   5.0   
+##  Max.   :5.0       EF1    :   4318   Max.   :2315.0    Max.   :4576.0   
+##  NA's   :1401627   (Other):   5848   NA's   :1141285   NA's   :1141285  
 ##  TOR_OTHER_WFO    TOR_OTHER_CZ_STATE TOR_OTHER_CZ_FIPS  TOR_OTHER_CZ_NAME 
-##         :654285          :654285     Min.   :  1.0               :654285  
+##         :669024          :669024     Min.   :  1.0               :669024  
 ##  JAN    :   111   AL     :   176     1st Qu.: 49.0     JEFFERSON :    20  
 ##  BMX    :   105   MS     :   141     Median : 93.0     MADISON   :    17  
-##  FFC    :    97   AR     :   127     Mean   :102.7     NEWTON    :    17  
+##  FFC    :    97   AR     :   127     Mean   :102.6     NEWTON    :    17  
 ##  LZK    :    90   OK     :   126     3rd Qu.:139.0     WASHINGTON:    17  
-##  OUN    :    78   GA     :   118     Max.   :740.0     LAWRENCE  :    14  
-##  (Other):  1217   (Other):  1010     NA's   :654285    (Other)   :  1613  
+##  (Other):  1307   (Other):  1140     Max.   :740.0     (Other)   :  1639  
+##  NA's   :731083   NA's   :731083     NA's   :1400107   NA's      :731083  
 ##   BEGIN_RANGE     BEGIN_AZIMUTH        BEGIN_LOCATION     END_RANGE     
-##  Min.   :  0.00          :263021              :241971   Min.   :  0.00  
-##  1st Qu.:  1.00   N      :104319   COUNTYWIDE :  1151   1st Qu.:  1.00  
-##  Median :  1.00   W      : 33094   SPRINGFIELD:   517   Median :  1.00  
-##  Mean   :  2.54   E      : 31485   COLUMBIA   :   478   Mean   :  2.57  
-##  3rd Qu.:  3.00   S      : 29833   AMARILLO   :   477   3rd Qu.:  3.00  
-##  Max.   :520.00   NW     : 22761   LEXINGTON  :   426   Max.   :520.00  
-##  NA's   :263021   (Other):171470   (Other)    :410963   NA's   :263000  
-##   END_AZIMUTH          END_LOCATION      BEGIN_LAT        BEGIN_LON      
-##         :263000              :241971   Min.   :-14.40   Min.   :-815.10  
-##  N      : 97430   COUNTYWIDE :  1145   1st Qu.: 34.57   1st Qu.: -97.22  
-##  E      : 32910   SPRINGFIELD:   500   Median : 38.08   Median : -90.10  
-##  W      : 31699   AMARILLO   :   482   Mean   : 37.85   Mean   : -91.32  
-##  S      : 30520   COLUMBIA   :   447   3rd Qu.: 41.36   3rd Qu.: -82.44  
-##  SE     : 21897   CLINTON    :   426   Max.   : 70.50   Max.   : 171.37  
-##  (Other):178527   (Other)    :411012   NA's   :247214   NA's   :247214   
-##     END_LAT          END_LON        DATA_SOURCE 
-##  Min.   :-14.46   Min.   :-815.10   CSV:607421  
-##  1st Qu.: 34.57   1st Qu.: -97.21   PDS: 48562  
-##  Median : 38.08   Median : -90.08               
-##  Mean   : 37.85   Mean   : -91.29               
-##  3rd Qu.: 41.35   3rd Qu.: -82.43               
-##  Max.   : 70.43   Max.   : 171.37               
-##  NA's   :247214   NA's   :247214
+##  Min.   :   0.0          :683773              :432868   Min.   :  0.0   
+##  1st Qu.:   0.0   N      :127649   COUNTYWIDE : 19665   1st Qu.:  0.0   
+##  Median :   1.0   W      : 52590   SPRINGFIELD:  1012   Median :  1.0   
+##  Mean   :   2.4   S      : 50417   AMARILLO   :   936   Mean   :  2.3   
+##  3rd Qu.:   3.0   E      : 47374   COLUMBIA   :   931   3rd Qu.:  3.0   
+##  Max.   :3749.0   (Other):252750   (Other)    :759141   Max.   :925.0   
+##  NA's   :652540   NA's   :187264   NA's       :187264   NA's   :652917  
+##   END_AZIMUTH          END_LOCATION      BEGIN_LAT        BEGIN_LON     
+##         :696854              :472223   Min.   :-14.4    Min.   :-815.1  
+##  N      :118352   COUNTYWIDE : 19717   1st Qu.: 34.4    1st Qu.: -97.6  
+##  S      : 48723   SPRINGFIELD:   985   Median : 38.0    Median : -91.7  
+##  W      : 48037   AMARILLO   :   941   Mean   : 37.9    Mean   : -92.8  
+##  E      : 47987   COLUMBIA   :   904   3rd Qu.: 41.4    3rd Qu.: -83.8  
+##  (Other):254600   (Other)    :719783   Max.   : 70.5    Max.   : 171.4  
+##  NA's   :187264   NA's       :187264   NA's   :535978   NA's   :535978  
+##     END_LAT          END_LON       DATA_SOURCE 
+##  Min.   :-14.5    Min.   :-815.1   CSV:666924  
+##  1st Qu.: 34.6    1st Qu.: -97.5   PDC:239915  
+##  Median : 38.0    Median : -91.2   PDS:307714  
+##  Mean   : 37.9    Mean   : -93.0   PUB:187264  
+##  3rd Qu.: 41.4    3rd Qu.: -83.4               
+##  Max.   : 70.4    Max.   : 171.4               
+##  NA's   :713360   NA's   :713359
+```
+
+## Introduction to the Table() Function
+
+According to R-Bloggers.com <https://www.r-bloggers.com/r-function-of-the-day-table/>, "the table() function is a very basic, but essential, function to master while performing interactive data analyses.  It simply creates tabular results of categorical variables.  However, when combined with the powers of logical expressions in R, you can gain even more insights into your data, including identifying potential problems.
+
+
+```r
+# Frequency of event types - sorted by decreasing count and selected for top 10 events.
+counts <- sort(table(stormdata$EVENT_TYPE), decreasing=TRUE)[1:10]
+
+# Output the first 5 rows of the file
+head(counts, n=25)
+```
+
+```
+## 
+## Thunderstorm Wind              Hail       Flash Flood           Tornado 
+##            397658            339848             72281             65851 
+##      Winter Storm         High Wind        Heavy Snow           Drought 
+##             64208             58732             54813             49115 
+##    Winter Weather             Flood 
+##             48635             42981
 ```
 
 ```r
-# Frequency of event types
-counts <- sort(table(stormdata$EVENT_TYPE), decreasing=TRUE)
-
 # Get the names of columns on counts table
 names(counts)
 ```
 
 ```
-##  [1] "Thunderstorm Wind"          "Hail"                      
-##  [3] "Flash Flood"                "Winter Weather"            
-##  [5] "Drought"                    "Winter Storm"              
-##  [7] "High Wind"                  "Heavy Snow"                
-##  [9] "Flood"                      "Marine Thunderstorm Wind"  
-## [11] "Tornado"                    "Heavy Rain"                
-## [13] "Strong Wind"                "Frost/Freeze"              
-## [15] "Heat"                       "Blizzard"                  
-## [17] "Dense Fog"                  "Lightning"                 
-## [19] "Extreme Cold/Wind Chill"    "Excessive Heat"            
-## [21] "Cold/Wind Chill"            "High Surf"                 
-## [23] "Ice Storm"                  "Funnel Cloud"              
-## [25] "Wildfire"                   "Waterspout"                
-## [27] "Tropical Storm"             "Coastal Flood"             
-## [29] "Lake-Effect Snow"           "Rip Current"               
-## [31] "Dust Storm"                 "Marine Hail"               
-## [33] "Astronomical Low Tide"      "Landslide"                 
-## [35] "Storm Surge/Tide"           "Avalanche"                 
-## [37] "Tropical Depression"        "Sleet"                     
-## [39] "Debris Flow"                "Marine High Wind"          
-## [41] "Freezing Fog"               "Hurricane"                 
-## [43] "Dust Devil"                 "Marine Strong Wind"        
-## [45] "Lakeshore Flood"            "Seiche"                    
-## [47] "Tsunami"                    "Dense Smoke"               
-## [49] "Marine Tropical Storm"      "Marine Hurricane/Typhoon"  
-## [51] "Sneakerwave"                "Marine Dense Fog"          
-## [53] "Volcanic Ashfall"           "Marine Lightning"          
-## [55] "Marine Tropical Depression" "Volcanic Ash"
+##  [1] "Thunderstorm Wind" "Hail"              "Flash Flood"      
+##  [4] "Tornado"           "Winter Storm"      "High Wind"        
+##  [7] "Heavy Snow"        "Drought"           "Winter Weather"   
+## [10] "Flood"
 ```
 
 ```r
@@ -407,308 +408,95 @@ names(counts)
 pie(counts)
 ```
 
-![](Data-Exploration_files/figure-html/unnamed-chunk-2-1.png) 
+![](Data-Exploration_files/figure-html/unnamed-chunk-3-1.png) 
 
 ```r
 # Simple Horizontal Bar Plot
 barplot(counts, main="Storm Event Type", horiz=TRUE, xlab="Frequency", names.arg=names(counts), cex.names=0.5, las=1)
 ```
 
-![](Data-Exploration_files/figure-html/unnamed-chunk-2-2.png) 
+![](Data-Exploration_files/figure-html/unnamed-chunk-3-2.png) 
 
-## Table Sub-Setting
+## Trend Analysis
 
-The exercises in the *Initial Table Exploration and Observation* section allowed us to conduct some basic observations about the data set as a whole.  This is helpful yet when you browse the data and to gain a general understanding of the table content.  Now you may want to extract data into a subset (ie. to extract data by eliminating additional columns or to even extract information based on specific observations.)  Sub-setting is similar to strategies whereby one might execute a SQL SELECT statement from a database.  The difference here now with R is that our main data frame is sitting in memory.  We can now take pieces of this data set and conduct separate analysis.
+It is now desirable to complete a trend analysis whereby we can visualize the frequency of events by year so that we can see if there is an upward trend in the number of occurrences of these major weather events.
 
-We will follow some instructions as outlined on the following webpage <http://www.statmethods.net/management/subset.html>
+I want to complete a sub-setting technique using R, such that I complete the equivalent of an SQL query like the following:
 
+SELECT YEAR, COUNT(*) 
+  FROM stormdata
+  WHERE EVENT_TYPE='Thunderstorm Wind'
+  GROUP BY YEAR
+  ORDER BY YEAR
+  
+### Thunderstorm Events
 
 
 ```r
-# Create visualization of the header of the unmodified file
-head(stormdata, n=5)
+# Subset the stormdata data frame
+thunderstorms <- stormdata[stormdata$EVENT_TYPE=="Thunderstorm Wind",c('YEAR', 'EVENT_TYPE', 'INJURIES_DIRECT', 'INJURIES_INDIRECT', 'DEATHS_DIRECT', 'DEATHS_INDIRECT', 'DAMAGE_PROPERTY', 'DAMAGE_CROPS', 'MAGNITUDE', 'MAGNITUDE_TYPE')] %>% group_by(YEAR) %>% summarise(number = n())
+
+# Creat Simple Plot
+plot(thunderstorms$YEAR, thunderstorms$number, type="p", main="Thunderstorms", xlab="Year", ylab="Number of Events")
 ```
 
-```
-##   X BEGIN_YEARMONTH BEGIN_DAY BEGIN_TIME END_YEARMONTH END_DAY END_TIME
-## 1 1          200604         7       1515        200604       7     1515
-## 2 2          200601         1          0        200601      31     2359
-## 3 3          200601         1          0        200601      31     2359
-## 4 4          200601         1          0        200601      31     2359
-## 5 5          200601         1          0        200601      31     2359
-##   EPISODE_ID EVENT_ID    STATE STATE_FIPS YEAR MONTH_NAME
-## 1    1207534  5501658  INDIANA         18 2006      April
-## 2    1202408  5482463 COLORADO          8 2006    January
-## 3    1202408  5482464 COLORADO          8 2006    January
-## 4    1202408  5482465 COLORADO          8 2006    January
-## 5    1202408  5482466 COLORADO          8 2006    January
-##          EVENT_TYPE CZ_TYPE CZ_FIPS                    CZ_NAME WFO
-## 1 Thunderstorm Wind       C      51                     GIBSON PAH
-## 2           Drought       Z       2  CENTRAL YAMPA RIVER BASIN GJT
-## 3           Drought       Z       7   DEBEQUE TO SILT CORRIDOR GJT
-## 4           Drought       Z       4 ELKHEAD AND PARK MOUNTAINS GJT
-## 5           Drought       Z      13          FLATTOP MOUNTAINS GJT
-##      BEGIN_DATE_TIME CZ_TIMEZONE      END_DATE_TIME INJURIES_DIRECT
-## 1 07-APR-06 15:15:00         CST 07-APR-06 15:15:00               0
-## 2 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
-## 3 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
-## 4 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
-## 5 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
-##   INJURIES_INDIRECT DEATHS_DIRECT DEATHS_INDIRECT DAMAGE_PROPERTY
-## 1                 0             0               0             60K
-## 2                 0             0               0                
-## 3                 0             0               0                
-## 4                 0             0               0                
-## 5                 0             0               0                
-##   DAMAGE_CROPS         SOURCE MAGNITUDE MAGNITUDE_TYPE FLOOD_CAUSE
-## 1              GENERAL PUBLIC        61             EG            
-## 2               GOVT OFFICIAL        NA                           
-## 3               GOVT OFFICIAL        NA                           
-## 4               GOVT OFFICIAL        NA                           
-## 5               GOVT OFFICIAL        NA                           
-##   CATEGORY TOR_F_SCALE TOR_LENGTH TOR_WIDTH TOR_OTHER_WFO
-## 1       NA                     NA        NA              
-## 2       NA                     NA        NA              
-## 3       NA                     NA        NA              
-## 4       NA                     NA        NA              
-## 5       NA                     NA        NA              
-##   TOR_OTHER_CZ_STATE TOR_OTHER_CZ_FIPS TOR_OTHER_CZ_NAME BEGIN_RANGE
-## 1                                   NA                             4
-## 2                                   NA                            NA
-## 3                                   NA                            NA
-## 4                                   NA                            NA
-## 5                                   NA                            NA
-##   BEGIN_AZIMUTH BEGIN_LOCATION END_RANGE END_AZIMUTH END_LOCATION
-## 1             E         PATOKA        NA             OAKLAND CITY
-## 2                                     NA                         
-## 3                                     NA                         
-## 4                                     NA                         
-## 5                                     NA                         
-##   BEGIN_LAT BEGIN_LON END_LAT END_LON DATA_SOURCE
-## 1     38.42    -87.52   38.33  -87.35         PDS
-## 2        NA        NA      NA      NA         PDS
-## 3        NA        NA      NA      NA         PDS
-## 4        NA        NA      NA      NA         PDS
-## 5        NA        NA      NA      NA         PDS
-```
+![](Data-Exploration_files/figure-html/unnamed-chunk-4-1.png) 
+
+### Hail Storm Events
+
 
 ```r
-# Select by column - with variable name
-myvars <- c("YEAR", "INJURIES_DIRECT", "INJURIES_INDIRECT", "DEATHS_DIRECT", "DEATHS_INDIRECT", "DAMAGE_PROPERTY", "DAMAGE_CROPS")
-impact <- stormdata[myvars]
-head(impact, n=5)
+# Subset the stormdata data frame
+hailstorms <- stormdata[stormdata$EVENT_TYPE=="Hail",c('YEAR', 'EVENT_TYPE', 'INJURIES_DIRECT', 'INJURIES_INDIRECT', 'DEATHS_DIRECT', 'DEATHS_INDIRECT', 'DAMAGE_PROPERTY', 'DAMAGE_CROPS', 'MAGNITUDE', 'MAGNITUDE_TYPE')] %>% group_by(YEAR) %>% summarise(number = n())
+
+# Creat Simple Plot
+plot(hailstorms$YEAR, hailstorms$number, type="p", main="Hail Storms", xlab="Year", ylab="Number of Events")
 ```
 
-```
-##   YEAR INJURIES_DIRECT INJURIES_INDIRECT DEATHS_DIRECT DEATHS_INDIRECT
-## 1 2006               0                 0             0               0
-## 2 2006               0                 0             0               0
-## 3 2006               0                 0             0               0
-## 4 2006               0                 0             0               0
-## 5 2006               0                 0             0               0
-##   DAMAGE_PROPERTY DAMAGE_CROPS
-## 1             60K             
-## 2                             
-## 3                             
-## 4                             
-## 5
-```
+![](Data-Exploration_files/figure-html/unnamed-chunk-5-1.png) 
+
+### Tornado Events
+
 
 ```r
-# Select by column - with column number
-newdata <- stormdata[c(1,5:10)]
-head(newdata, n=5)
+# Subset the stormdata data frame
+tornados <- stormdata[stormdata$EVENT_TYPE=="Tornado",c('YEAR', 'EVENT_TYPE', 'INJURIES_DIRECT', 'INJURIES_INDIRECT', 'DEATHS_DIRECT', 'DEATHS_INDIRECT', 'DAMAGE_PROPERTY', 'DAMAGE_CROPS', 'MAGNITUDE', 'MAGNITUDE_TYPE')] %>% group_by(YEAR) %>% summarise(number = n())
+
+# Creat Simple Plot
+plot(tornados$YEAR, tornados$number, type="p", main="Tornados", xlab="Year", ylab="Number of Events")
 ```
 
-```
-##   X END_YEARMONTH END_DAY END_TIME EPISODE_ID EVENT_ID    STATE
-## 1 1        200604       7     1515    1207534  5501658  INDIANA
-## 2 2        200601      31     2359    1202408  5482463 COLORADO
-## 3 3        200601      31     2359    1202408  5482464 COLORADO
-## 4 4        200601      31     2359    1202408  5482465 COLORADO
-## 5 5        200601      31     2359    1202408  5482466 COLORADO
-```
+![](Data-Exploration_files/figure-html/unnamed-chunk-6-1.png) 
+
+### Winter Storm Events
+
 
 ```r
-# Select by column - exclusion by column name
-myvars <- names(stormdata) %in% c("v1", "v2", "v3")
-newdata <- stormdata[!myvars]
-head(newdata, n=5)
+# Subset the stormdata data frame
+winterstorms <- stormdata[stormdata$EVENT_TYPE=="Winter Storm",c('YEAR', 'EVENT_TYPE', 'INJURIES_DIRECT', 'INJURIES_INDIRECT', 'DEATHS_DIRECT', 'DEATHS_INDIRECT', 'DAMAGE_PROPERTY', 'DAMAGE_CROPS', 'MAGNITUDE', 'MAGNITUDE_TYPE')] %>% group_by(YEAR) %>% summarise(number = n())
+
+# Creat Simple Plot
+plot(winterstorms$YEAR, winterstorms$number, type="p", main="Winter Storms", xlab="Year", ylab="Number of Events")
 ```
 
-```
-##   X BEGIN_YEARMONTH BEGIN_DAY BEGIN_TIME END_YEARMONTH END_DAY END_TIME
-## 1 1          200604         7       1515        200604       7     1515
-## 2 2          200601         1          0        200601      31     2359
-## 3 3          200601         1          0        200601      31     2359
-## 4 4          200601         1          0        200601      31     2359
-## 5 5          200601         1          0        200601      31     2359
-##   EPISODE_ID EVENT_ID    STATE STATE_FIPS YEAR MONTH_NAME
-## 1    1207534  5501658  INDIANA         18 2006      April
-## 2    1202408  5482463 COLORADO          8 2006    January
-## 3    1202408  5482464 COLORADO          8 2006    January
-## 4    1202408  5482465 COLORADO          8 2006    January
-## 5    1202408  5482466 COLORADO          8 2006    January
-##          EVENT_TYPE CZ_TYPE CZ_FIPS                    CZ_NAME WFO
-## 1 Thunderstorm Wind       C      51                     GIBSON PAH
-## 2           Drought       Z       2  CENTRAL YAMPA RIVER BASIN GJT
-## 3           Drought       Z       7   DEBEQUE TO SILT CORRIDOR GJT
-## 4           Drought       Z       4 ELKHEAD AND PARK MOUNTAINS GJT
-## 5           Drought       Z      13          FLATTOP MOUNTAINS GJT
-##      BEGIN_DATE_TIME CZ_TIMEZONE      END_DATE_TIME INJURIES_DIRECT
-## 1 07-APR-06 15:15:00         CST 07-APR-06 15:15:00               0
-## 2 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
-## 3 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
-## 4 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
-## 5 01-JAN-06 00:00:00         MST 31-JAN-06 23:59:00               0
-##   INJURIES_INDIRECT DEATHS_DIRECT DEATHS_INDIRECT DAMAGE_PROPERTY
-## 1                 0             0               0             60K
-## 2                 0             0               0                
-## 3                 0             0               0                
-## 4                 0             0               0                
-## 5                 0             0               0                
-##   DAMAGE_CROPS         SOURCE MAGNITUDE MAGNITUDE_TYPE FLOOD_CAUSE
-## 1              GENERAL PUBLIC        61             EG            
-## 2               GOVT OFFICIAL        NA                           
-## 3               GOVT OFFICIAL        NA                           
-## 4               GOVT OFFICIAL        NA                           
-## 5               GOVT OFFICIAL        NA                           
-##   CATEGORY TOR_F_SCALE TOR_LENGTH TOR_WIDTH TOR_OTHER_WFO
-## 1       NA                     NA        NA              
-## 2       NA                     NA        NA              
-## 3       NA                     NA        NA              
-## 4       NA                     NA        NA              
-## 5       NA                     NA        NA              
-##   TOR_OTHER_CZ_STATE TOR_OTHER_CZ_FIPS TOR_OTHER_CZ_NAME BEGIN_RANGE
-## 1                                   NA                             4
-## 2                                   NA                            NA
-## 3                                   NA                            NA
-## 4                                   NA                            NA
-## 5                                   NA                            NA
-##   BEGIN_AZIMUTH BEGIN_LOCATION END_RANGE END_AZIMUTH END_LOCATION
-## 1             E         PATOKA        NA             OAKLAND CITY
-## 2                                     NA                         
-## 3                                     NA                         
-## 4                                     NA                         
-## 5                                     NA                         
-##   BEGIN_LAT BEGIN_LON END_LAT END_LON DATA_SOURCE
-## 1     38.42    -87.52   38.33  -87.35         PDS
-## 2        NA        NA      NA      NA         PDS
-## 3        NA        NA      NA      NA         PDS
-## 4        NA        NA      NA      NA         PDS
-## 5        NA        NA      NA      NA         PDS
-```
+![](Data-Exploration_files/figure-html/unnamed-chunk-7-1.png) 
+
+### Snow Storm Events
+
 
 ```r
-# Select by column - exclusion by coumn number
-newdata <- stormdata[c(-3,-5)]
-head(newdata, n=5)
+# Subset the stormdata data frame
+snowstorms <- stormdata[stormdata$EVENT_TYPE=="Heavy Snow",c('YEAR', 'EVENT_TYPE', 'INJURIES_DIRECT', 'INJURIES_INDIRECT', 'DEATHS_DIRECT', 'DEATHS_INDIRECT', 'DAMAGE_PROPERTY', 'DAMAGE_CROPS', 'MAGNITUDE', 'MAGNITUDE_TYPE')] %>% group_by(YEAR) %>% summarise(number = n())
+
+# Creat Simple Plot
+plot(snowstorms$YEAR, snowstorms$number, type="p", main="Snow Storms", xlab="Year", ylab="Number of Events")
 ```
 
-```
-##   X BEGIN_YEARMONTH BEGIN_TIME END_DAY END_TIME EPISODE_ID EVENT_ID
-## 1 1          200604       1515       7     1515    1207534  5501658
-## 2 2          200601          0      31     2359    1202408  5482463
-## 3 3          200601          0      31     2359    1202408  5482464
-## 4 4          200601          0      31     2359    1202408  5482465
-## 5 5          200601          0      31     2359    1202408  5482466
-##      STATE STATE_FIPS YEAR MONTH_NAME        EVENT_TYPE CZ_TYPE CZ_FIPS
-## 1  INDIANA         18 2006      April Thunderstorm Wind       C      51
-## 2 COLORADO          8 2006    January           Drought       Z       2
-## 3 COLORADO          8 2006    January           Drought       Z       7
-## 4 COLORADO          8 2006    January           Drought       Z       4
-## 5 COLORADO          8 2006    January           Drought       Z      13
-##                      CZ_NAME WFO    BEGIN_DATE_TIME CZ_TIMEZONE
-## 1                     GIBSON PAH 07-APR-06 15:15:00         CST
-## 2  CENTRAL YAMPA RIVER BASIN GJT 01-JAN-06 00:00:00         MST
-## 3   DEBEQUE TO SILT CORRIDOR GJT 01-JAN-06 00:00:00         MST
-## 4 ELKHEAD AND PARK MOUNTAINS GJT 01-JAN-06 00:00:00         MST
-## 5          FLATTOP MOUNTAINS GJT 01-JAN-06 00:00:00         MST
-##        END_DATE_TIME INJURIES_DIRECT INJURIES_INDIRECT DEATHS_DIRECT
-## 1 07-APR-06 15:15:00               0                 0             0
-## 2 31-JAN-06 23:59:00               0                 0             0
-## 3 31-JAN-06 23:59:00               0                 0             0
-## 4 31-JAN-06 23:59:00               0                 0             0
-## 5 31-JAN-06 23:59:00               0                 0             0
-##   DEATHS_INDIRECT DAMAGE_PROPERTY DAMAGE_CROPS         SOURCE MAGNITUDE
-## 1               0             60K              GENERAL PUBLIC        61
-## 2               0                               GOVT OFFICIAL        NA
-## 3               0                               GOVT OFFICIAL        NA
-## 4               0                               GOVT OFFICIAL        NA
-## 5               0                               GOVT OFFICIAL        NA
-##   MAGNITUDE_TYPE FLOOD_CAUSE CATEGORY TOR_F_SCALE TOR_LENGTH TOR_WIDTH
-## 1             EG                   NA                     NA        NA
-## 2                                  NA                     NA        NA
-## 3                                  NA                     NA        NA
-## 4                                  NA                     NA        NA
-## 5                                  NA                     NA        NA
-##   TOR_OTHER_WFO TOR_OTHER_CZ_STATE TOR_OTHER_CZ_FIPS TOR_OTHER_CZ_NAME
-## 1                                                 NA                  
-## 2                                                 NA                  
-## 3                                                 NA                  
-## 4                                                 NA                  
-## 5                                                 NA                  
-##   BEGIN_RANGE BEGIN_AZIMUTH BEGIN_LOCATION END_RANGE END_AZIMUTH
-## 1           4             E         PATOKA        NA            
-## 2          NA                                     NA            
-## 3          NA                                     NA            
-## 4          NA                                     NA            
-## 5          NA                                     NA            
-##   END_LOCATION BEGIN_LAT BEGIN_LON END_LAT END_LON DATA_SOURCE
-## 1 OAKLAND CITY     38.42    -87.52   38.33  -87.35         PDS
-## 2                     NA        NA      NA      NA         PDS
-## 3                     NA        NA      NA      NA         PDS
-## 4                     NA        NA      NA      NA         PDS
-## 5                     NA        NA      NA      NA         PDS
-```
+![](Data-Exploration_files/figure-html/unnamed-chunk-8-1.png) 
 
-```r
-# Select by column - delete variables v3 and v5
-#mydata$v3 <- mydata$v5 <- NULL
+## Conclusions
 
+This data analysis project has certainly exposed me to many tools and resources which are available in order to complete a data mining project using important historical data sets.  We have gathered a total of 65 years of weather data for this exercise from the United States government via Data.gov and we have explored the content of this data with the aid of R Studio.  We set out to see if we could create a visualization of this data that demonstrates claims that global warming could be contributing to an increased occurrence of weather events here within the United States.  The historical data certainly shows a significant increase in the occurrence of all weather events (with the only exception where there is limited historical data).  In fact, the records show that the increased frequency of storms is shockingly increasing at what appears to be logarithmic rates.  What we don't know from this data is whether or not the sharp upward trend is a reflection of our increased ability to monitor and to gather this data or if there is a real upward rate in actual occurrence of these weather events.
 
-
-# Select by Observation - first 5 observations
-newdata <- impact[1:5,]
-head(newdata, n=10)
-```
-
-```
-##   YEAR INJURIES_DIRECT INJURIES_INDIRECT DEATHS_DIRECT DEATHS_INDIRECT
-## 1 2006               0                 0             0               0
-## 2 2006               0                 0             0               0
-## 3 2006               0                 0             0               0
-## 4 2006               0                 0             0               0
-## 5 2006               0                 0             0               0
-##   DAMAGE_PROPERTY DAMAGE_CROPS
-## 1             60K             
-## 2                             
-## 3                             
-## 4                             
-## 5
-```
-
-```r
-# Select by Observation - based on variables values
-newdata <- impact[ which(impact$year==2006), ]
-head(newdata, n=10)
-```
-
-```
-## [1] YEAR              INJURIES_DIRECT   INJURIES_INDIRECT DEATHS_DIRECT    
-## [5] DEATHS_INDIRECT   DAMAGE_PROPERTY   DAMAGE_CROPS     
-## <0 rows> (or 0-length row.names)
-```
-
-```r
-# Select by Observation - using subset function
-newdata <- subset(impact, impact$year==2010, select=c(DAMAGE_PROPERTY, DAMAGE_CROPS))
-head(newdata, n=10)
-```
-
-```
-## [1] DAMAGE_PROPERTY DAMAGE_CROPS   
-## <0 rows> (or 0-length row.names)
-```
-
+This exercise was not intended to break any ground by creating any new awareness of what has been studied many times before this one.  The main purpose of my personal study was to gather an increased awareness of how to gather and how to complete a data mining study with some rather interesting data.
 
